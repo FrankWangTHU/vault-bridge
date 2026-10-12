@@ -51,6 +51,13 @@ async function checkPath(root: string, relative: string): Promise<void> {
   let current = root;
   const rootStat = await fs.lstat(root);
   if (rootStat.isSymbolicLink() || !rootStat.isDirectory()) throw new Error('Vault 根目录必须是普通目录，不能是符号链接。');
+  let ancestor = path.dirname(path.resolve(root));
+  while (true) {
+    if ((await fs.lstat(ancestor)).isSymbolicLink()) throw new Error('Vault 路径包含符号链接，请使用真实路径。');
+    const parent = path.dirname(ancestor);
+    if (parent === ancestor) break;
+    ancestor = parent;
+  }
   const pieces = relative ? safeRelative(relative).split('/') : [];
   for (let i = 0; i < pieces.length; i++) {
     current = path.join(current, pieces[i]);
@@ -59,9 +66,6 @@ async function checkPath(root: string, relative: string): Promise<void> {
     if (stat.isSymbolicLink()) throw new Error(`不能使用符号链接：${current}`);
     if (i < pieces.length - 1 && !stat.isDirectory()) throw new Error(`父路径不是文件夹：${current}`);
   }
-  const canonicalRoot = await fs.realpath(root);
-  // Root aliases through ancestor symlinks are rejected as well.
-  if (key(path.resolve(canonicalRoot)) !== key(path.resolve(root))) throw new Error('Vault 路径包含符号链接，请使用真实路径。');
 }
 function isWithin(parent: string, child: string): boolean {
   const rel = path.relative(parent, child);
@@ -85,14 +89,18 @@ async function existingCaseInsensitive(root: string, relative: string): Promise<
 
 export async function planCopy(request: CopyRequest): Promise<CopyPlan> {
   if (!path.isAbsolute(request.sourceRoot) || !path.isAbsolute(request.targetRoot)) throw new Error('请填写 Vault 的绝对路径。');
-  const sourceRoot = path.resolve(request.sourceRoot), targetRoot = path.resolve(request.targetRoot);
-  if (isWithin(sourceRoot, targetRoot) || isWithin(targetRoot, sourceRoot)) throw new Error('目标必须是独立的其他 Vault，不能与源 Vault 相同或相互嵌套。');
+  let sourceRoot = path.resolve(request.sourceRoot), targetRoot = path.resolve(request.targetRoot);
   const selection = safeRelative(request.selection), destination = safeRelative(request.destination.trim(), true);
   const configDir = request.configDir ?? '.obsidian';
   const isConfig = (relative: string) => relative === configDir || relative.startsWith(`${configDir}/`) || relative.split('/').some(p => excluded.has(p.toLowerCase()));
   if (isConfig(selection)) throw new Error('不能复制 Vault 配置目录。');
   await checkPath(sourceRoot, selection);
   await checkPath(targetRoot, destination);
+  // Windows short (8.3) names are legitimate aliases, not symbolic links.
+  // Canonicalize only after checking actual link types, then compare vault roots.
+  sourceRoot = await fs.realpath(sourceRoot);
+  targetRoot = await fs.realpath(targetRoot);
+  if (isWithin(sourceRoot, targetRoot) || isWithin(targetRoot, sourceRoot)) throw new Error('目标必须是独立的其他 Vault，不能与源 Vault 相同或相互嵌套。');
   const marker = await statOrNull(path.join(targetRoot, '.obsidian'));
   if (!marker?.isDirectory() || marker.isSymbolicLink()) throw new Error('目标目录不是可识别的 Vault：需包含普通 .obsidian 文件夹。');
   const selectionStat = await fs.lstat(path.join(sourceRoot, selection));

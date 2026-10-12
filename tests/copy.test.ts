@@ -60,6 +60,7 @@ describe('cross-vault copies', () => {
     for (const value of ['../escape', '/absolute', 'C:\\absolute', 'a/../../b', '.obsidian/config', 'a/NUL.txt']) expect(() => safeRelative(value)).toThrow();
     await put(source, 'a.md');
     await expect(planCopy(request('a.md', { targetRoot: source }))).rejects.toThrow('独立');
+    await fs.mkdir(path.join(source, 'nested'));
     await expect(planCopy(request('a.md', { targetRoot: path.join(source, 'nested') }))).rejects.toThrow('独立');
     await expect(planCopy(request('a.md', { destination: '../outside' }))).rejects.toThrow('越界');
     await expect(planCopy(request('.obsidian/config'))).rejects.toThrow('配置');
@@ -81,6 +82,13 @@ describe('cross-vault copies', () => {
     await expect(executeCopy(plan)).rejects.toThrow('重新预览');
     await expect(fs.stat(path.join(target, plan.entries[0].destination))).rejects.toThrow();
     expect(await fs.readFile(path.join(target, plan.entries[1].destination), 'utf8')).toBe('created after preview');
+  });
+  it('rejects vaults reached through an ancestor directory junction', async () => {
+    await put(source, 'a.md');
+    await fs.mkdir(path.join(target, 'nested/.obsidian'), { recursive: true });
+    const alias = path.join(temp, 'target-alias');
+    await fs.symlink(target, alias, 'junction');
+    await expect(planCopy(request('a.md', { targetRoot: path.join(alias, 'nested') }))).rejects.toThrow('符号链接');
   });
   it('rejects changed source content and removes only newly created empty folders', async () => {
     await put(source, 'a.md', 'old'); const plan = await planCopy(request('a.md'));
