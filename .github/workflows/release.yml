@@ -1,0 +1,24 @@
+name: Release
+on:
+  push:
+    tags: ['0.*', '1.*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm package
+      - name: Verify release version
+        run: node -e "if (require('./manifest.json').version !== process.env.GITHUB_REF_NAME) process.exit(1)"
+      - name: Publish installable files
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create "$GITHUB_REF_NAME" main.js manifest.json styles.css dist/vault-bridge-*.zip --title "VaultBridge $GITHUB_REF_NAME" --notes-file RELEASE_NOTES.md

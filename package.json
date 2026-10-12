@@ -1,0 +1,32 @@
+{
+  "name": "vault-bridge",
+  "version": "0.1.0",
+  "description": "Local paths, safe cross-vault copies, and math/table paste for Obsidian.",
+  "private": true,
+  "author": "Yanlu Wang",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node esbuild.config.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build": "node esbuild.config.mjs",
+    "check": "pnpm typecheck && pnpm test && pnpm build",
+    "package": "pnpm build && node scripts/package.mjs"
+  },
+  "dependencies": {
+    "mdast-util-from-markdown": "^2.0.2",
+    "turndown": "^7.2.0"
+  },
+  "devDependencies": {
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^22.10.0",
+    "@types/turndown": "^5.0.5",
+    "esbuild": "^0.25.0",
+    "jsdom": "^26.0.0",
+    "jszip": "^3.10.1",
+    "obsidian": "1.7.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.2.0"
+  },
+  "packageManager": "pnpm@11.25.0"
+}

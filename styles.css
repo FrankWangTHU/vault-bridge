@@ -1,0 +1,5 @@
+.vault-bridge-modal { min-width: min(580px, 80vw); }
+.vault-bridge-modal .setting-item-control input { width: min(300px, 40vw); }
+.vault-bridge-preview { max-height: 40vh; overflow: auto; overflow-wrap: anywhere; }
+.vault-bridge-preview li { margin-bottom: 0.4em; }
+.vault-bridge-preview h4 { margin-bottom: 0.4em; }
