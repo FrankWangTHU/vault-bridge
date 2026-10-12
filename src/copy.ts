@@ -6,7 +6,7 @@ import { extractLinks, isExternal, splitTarget, type NoteLink } from './markdown
 export interface CopyRequest {
   sourceRoot: string;
   targetRoot: string;
-  selection: string;
+  selection: string | string[];
   destination: string;
   configDir?: string;
   resolve: (link: string, source: string) => string | null;
@@ -90,11 +90,14 @@ async function existingCaseInsensitive(root: string, relative: string): Promise<
 export async function planCopy(request: CopyRequest): Promise<CopyPlan> {
   if (!path.isAbsolute(request.sourceRoot) || !path.isAbsolute(request.targetRoot)) throw new Error('请填写 Vault 的绝对路径。');
   let sourceRoot = path.resolve(request.sourceRoot), targetRoot = path.resolve(request.targetRoot);
-  const selection = safeRelative(request.selection), destination = safeRelative(request.destination.trim(), true);
+  const selections = [...new Set((Array.isArray(request.selection) ? request.selection : [request.selection]).map(p => safeRelative(p)))];
+  if (!selections.length) throw new Error('请先选择文件或文件夹。');
+  const roots = selections.filter(p => !selections.some(other => p !== other && p.startsWith(`${other}/`)));
+  const destination = safeRelative(request.destination.trim(), true);
   const configDir = request.configDir ?? '.obsidian';
   const isConfig = (relative: string) => relative === configDir || relative.startsWith(`${configDir}/`) || relative.split('/').some(p => excluded.has(p.toLowerCase()));
-  if (isConfig(selection)) throw new Error('不能复制 Vault 配置目录。');
-  await checkPath(sourceRoot, selection);
+  if (roots.some(isConfig)) throw new Error('不能复制 Vault 配置目录。');
+  for (const selection of roots) await checkPath(sourceRoot, selection);
   await checkPath(targetRoot, destination);
   // Windows short (8.3) names are legitimate aliases, not symbolic links.
   // Canonicalize only after checking actual link types, then compare vault roots.
@@ -103,8 +106,8 @@ export async function planCopy(request: CopyRequest): Promise<CopyPlan> {
   if (isWithin(sourceRoot, targetRoot) || isWithin(targetRoot, sourceRoot)) throw new Error('目标必须是独立的其他 Vault，不能与源 Vault 相同或相互嵌套。');
   const marker = await statOrNull(path.join(targetRoot, '.obsidian'));
   if (!marker?.isDirectory() || marker.isSymbolicLink()) throw new Error('目标目录不是可识别的 Vault：需包含普通 .obsidian 文件夹。');
-  const selectionStat = await fs.lstat(path.join(sourceRoot, selection));
   const files: string[] = [], folders: string[] = [], warnings: string[] = [];
+  const baseByRoot = new Map<string, string>();
   async function collect(relative: string) {
     if (isConfig(relative)) { warnings.push(`已跳过配置目录：${relative}`); return; }
     safeRelative(relative);
@@ -116,7 +119,10 @@ export async function planCopy(request: CopyRequest): Promise<CopyPlan> {
     } else if (stat.isFile()) files.push(relative);
     else warnings.push(`已跳过特殊文件：${relative}`);
   }
-  await collect(selection);
+  for (const selection of roots) {
+    baseByRoot.set(selection, (await fs.lstat(path.join(sourceRoot, selection))).isDirectory() ? path.posix.dirname(selection) : '');
+    await collect(selection);
+  }
   const selected = new Set(files), allFiles = new Set(files);
   const documents = new Map<string, { text: string; links: { ref: NoteLink; resolved: string | null }[] }>();
   for (const file of files.filter(p => p.toLowerCase().endsWith('.md'))) {
@@ -145,10 +151,12 @@ export async function planCopy(request: CopyRequest): Promise<CopyPlan> {
   }
   const mapping = new Map<string, string>(), reserved = new Set<string>(), renamed: CopyPlan['renamed'] = [];
   const join = (...parts: string[]) => parts.filter(Boolean).join('/');
-  const selectedParent = selectionStat.isDirectory() ? path.posix.dirname(selection) : '';
-  const candidateFor = (source: string) => selected.has(source) || folders.includes(source)
-    ? join(destination, selectionStat.isDirectory() ? path.posix.relative(selectedParent, source) : path.posix.basename(source))
-    : join(destination, '_attachments', 'vault-bridge', path.posix.basename(source));
+  const candidateFor = (source: string) => {
+    if (!selected.has(source) && !folders.includes(source)) return join(destination, '_attachments', 'vault-bridge', path.posix.basename(source));
+    const owner = roots.find(root => source === root || source.startsWith(`${root}/`))!;
+    const base = baseByRoot.get(owner)!;
+    return join(destination, base ? path.posix.relative(base, source) : path.posix.basename(source));
+  };
   // Check directory structure first so files cannot be mapped beneath a file or symlink.
   const directories = new Set(folders.map(candidateFor));
   for (const source of allFiles) {

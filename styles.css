@@ -1,5 +1,19 @@
-.vault-bridge-modal { min-width: min(580px, 80vw); }
-.vault-bridge-modal .setting-item-control input { width: min(300px, 40vw); }
-.vault-bridge-preview { max-height: 40vh; overflow: auto; overflow-wrap: anywhere; }
+.vault-bridge-dialog { width: min(560px, 92vw); max-width: 92vw; }
+.vault-bridge-modal { min-width: 0; overflow-x: hidden; }
+.vault-bridge-modal *, .vault-bridge-modal *::before, .vault-bridge-modal *::after { box-sizing: border-box; }
+.vault-bridge-path { display: block; overflow-wrap: anywhere; min-width: 0; }
+.vault-bridge-list { display: flex; flex-direction: column; gap: 8px; max-height: 32vh; overflow-y: auto; margin: 12px 0; }
+.vault-bridge-modal .vault-bridge-choice { display: block; width: 100%; height: auto; min-height: 44px; padding: 12px; text-align: left; white-space: normal; }
+.vault-bridge-choice small { color: var(--text-muted); margin-top: 4px; }
+.vault-bridge-choice.is-active { outline: 2px solid var(--interactive-accent); outline-offset: -2px; background: var(--background-modifier-hover); }
+.vault-bridge-badge { color: var(--text-muted); font-size: var(--font-smallest); margin-left: 8px; }
+.vault-bridge-location, .vault-bridge-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 12px 0; }
+.vault-bridge-location .vault-bridge-path { flex: 1 1 180px; }
+.vault-bridge-actions { justify-content: flex-end; }
+.vault-bridge-actions button { max-width: 100%; height: auto; min-height: 32px; white-space: normal; overflow-wrap: anywhere; }
+.vault-bridge-preview { max-height: 30vh; overflow: auto; overflow-wrap: anywhere; }
 .vault-bridge-preview li { margin-bottom: 0.4em; }
-.vault-bridge-preview h4 { margin-bottom: 0.4em; }
+.vault-bridge-manual { margin: 12px 0; }
+.vault-bridge-manual .setting-item { flex-wrap: wrap; gap: 8px; }
+.vault-bridge-manual .setting-item-control { min-width: 0; flex-wrap: wrap; }
+.vault-bridge-manual input { max-width: 100%; width: 220px; }

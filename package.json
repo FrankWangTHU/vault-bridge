@@ -1,6 +1,6 @@
 {
   "name": "vault-bridge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Local paths, safe cross-vault copies, and math/table paste for Obsidian.",
   "private": true,
   "author": "Yanlu Wang",

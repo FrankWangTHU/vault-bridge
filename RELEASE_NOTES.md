@@ -1,9 +1,10 @@
-VaultBridge（库桥）0.1.0：
+VaultBridge（库桥）0.2.0：
 
-- 文件/文件夹右键复制本地绝对路径。
-- 笔记或文件夹携带本地附件跨 Vault 复制，预览清单、重名改名并更新链接。
-- 自动转换粘贴的 LaTeX 公式、带公式源码的 HTML 和普通 HTML 表格，可关闭自动转换或手动转换选区。
+- 修复分隔符反斜杠丢失的公式，例如 `[ \boxed{...} ]` 和 `(P(\theta))`；新增“修复当前笔记的公式”命令，已有笔记可一次修复并撤销。
+- 自动发现 Obsidian 已登记的 Vault，点击目标库即可复制；支持直接浏览目标文件夹，预览改为可选，适配窄窗口和长路径。
+- 支持文件列表多选复制，统一处理共享附件、链接和重名。
+- 新增跨 Vault 窗口拖拽复制（实验性）：两边均需启用新版插件，拖到目标库左侧文件列表后松开；源文件保留。同库拖动沿用原有行为。
 
-下载 `vault-bridge-0.1.0.zip`，将其中的 `vault-bridge` 文件夹放入 Vault 的 `.obsidian/plugins/`，然后在 Obsidian 第三方插件设置中启用。需 Obsidian 1.7.2+ 桌面版。
+下载 `vault-bridge-0.2.0.zip`，将其中的 `vault-bridge` 文件夹放入 Vault 的 `.obsidian/plugins/`。升级时替换 `main.js`、`manifest.json`、`styles.css`，保留原有 `data.json`，然后重新加载插件或重启 Obsidian。需 Obsidian 1.7.2+ 桌面版。跨库拖拽需两个 Vault 都升级。
 
-首版不递归复制关联笔记，不解析属性区/HTML/Canvas 内部附件，复杂表格和缺少 LaTeX 源码的公式保留默认粘贴。真实 Obsidian 和真实 ChatGPT 剪贴板的端到端验收仍待完成，详见 README 与 TESTING。
+本地自动测试覆盖截图公式、复制界面、拖拽事件与临时 Vault 复制；真实 Obsidian 跨窗口拖拽、阅读视图渲染和真实 ChatGPT 剪贴板的端到端验收仍待完成。拖拽不可用时请使用右键复制。升级不会自动改写已有笔记，请运行修复命令处理旧内容。其他支持边界见 README 与 TESTING。

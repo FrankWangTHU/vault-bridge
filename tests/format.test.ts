@@ -4,6 +4,26 @@ import { convertClipboard, convertMath } from '../src/format';
 import { extractLinks, isProtectedPosition } from '../src/markdown';
 
 describe('math conversion', () => {
+  it('repairs the supplied Bayes-formula screenshot, including nested inline parentheses', () => {
+    const body = '\\boxed{P(\\theta\\mid D)=\\frac{P(D\\mid\\theta)P(\\theta)}{P(D)}}';
+    const text = `[ ${body} ]\n\n其中：\n- (P(\\theta\\mid D))：后验概率（Posterior）\n- (P(D\\mid\\theta))：似然（Likelihood）\n- (P(\\theta))：先验概率（Prior）\n- (P(D))：证据（Evidence）`;
+    const result = convertClipboard(text).text;
+    expect(result).toContain(`$$\n${body}\n$$`);
+    expect(result).toContain('$P(\\theta\\mid D)$');
+    expect(result).toContain('$P(D\\mid\\theta)$');
+    expect(result).toContain('$P(\\theta)$'); expect(result).toContain('$P(D)$');
+    expect(convertClipboard(result).text).toBe(result);
+  });
+  it('does not mistake prose, links, code, wiki links or broken braces for bare math', () => {
+    for (const text of ['(Prior)', '[text](https://example.com)', '[\\theta](url)', '[[\\theta]]', '`(\\theta)`', '```\n[\\frac{x}{y}]\n```', '[\\boxed{x]']) {
+      expect(convertMath(text)).toBe(text);
+    }
+  });
+  it('repairs a multiline square-bracket expression and escaped HTML text nodes in tables', () => {
+    expect(convertMath('[\n\\frac{x}{y}\n]')).toBe('$$\n\\frac{x}{y}\n$$');
+    const result = convertClipboard('', '<table><tr><th>公式</th></tr><tr><td>(P(\\theta))</td></tr></table>');
+    expect(result.text).toContain('$P(\\theta)$'); expect(result.text).not.toContain('\\\\theta');
+  });
   it('converts inline and display math without swallowing surrounding text', () => {
     expect(convertMath('中文 \\(x^2\\) 文本')).toBe('中文 $x^2$ 文本');
     expect(convertMath('before\\[a+b\\]after')).toBe('before\n\n$$\na+b\n$$\n\nafter');

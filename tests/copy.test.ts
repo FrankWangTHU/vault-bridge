@@ -26,6 +26,15 @@ afterEach(async () => {
 });
 
 describe('cross-vault copies', () => {
+  it('copies a multi-selection in one mapping, deduplicates descendants and preserves cross-note links', async () => {
+    await put(source, 'Folder/a.md', '[[other/b.md]] ![[shared.png]]');
+    await put(source, 'other/b.md', '[[Folder/a.md]] ![[shared.png]]'); await put(source, 'shared.png');
+    const plan = await planCopy(request('Folder', { selection: ['Folder', 'Folder/a.md', 'other/b.md'] }));
+    expect(plan.notes).toBe(2); expect(plan.attachments).toBe(1);
+    await executeCopy(plan);
+    expect(await fs.readFile(path.join(target, '导入/Folder/a.md'), 'utf8')).toContain('[[导入/b.md]]');
+    expect(await fs.readFile(path.join(target, '导入/b.md'), 'utf8')).toContain('[[导入/Folder/a.md]]');
+  });
   it('copies shared attachments once, rewrites aliases/anchors, preserves originals and auto-renames', async () => {
     const original = '![[assets/图 片.png|300]]\n![alt](assets/图%20片.png)\n[[elsewhere.md#Section|other]]\n![[missing.png]]';
     await put(source, '笔记.md', original); await put(source, 'assets/图 片.png', 'image'); await put(source, 'elsewhere.md', 'other note');

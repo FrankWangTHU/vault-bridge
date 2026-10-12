@@ -1,11 +1,54 @@
 import TurndownService from 'turndown';
-import { protectedRanges } from './markdown';
+import { extractLinks, protectedRanges } from './markdown';
 
 export interface Conversion { text: string; changed: boolean; warnings: string[] }
 
+function displayMath(text: string, start: number, end: number, body: string): string {
+  const before = text.slice(0, start), after = text.slice(end);
+  return `${before && !before.endsWith('\n\n') ? (before.endsWith('\n') ? '\n' : '\n\n') : ''}$$\n${body}\n$$${after && !after.startsWith('\n\n') ? (after.startsWith('\n') ? '\n' : '\n\n') : ''}`;
+}
+
+// Rich-text copying can strip only the slashes from \[...\] and \(...\).
+// Recover balanced delimiters only when their contents have strong math evidence.
+export function repairMathDelimiters(text: string, tableCell = false): string {
+  const ranges = [...protectedRanges(text), ...extractLinks(text)];
+  const changes: { start: number; end: number; value: string }[] = [];
+  const latex = /\\(?:frac|dfrac|tfrac|boxed|sqrt|sum|prod|int|lim|log|ln|exp|sin|cos|tan|theta|alpha|beta|gamma|delta|epsilon|varepsilon|lambda|mu|sigma|phi|varphi|pi|omega|tau|rho|eta|nu|xi|psi|zeta|mid|cdot|times|div|pm|mp|leq|geq|neq|approx|infty|partial|nabla|mathbb|mathcal|mathbf|mathrm|text|begin|overline|vec|hat|bar|left|right)\b/i;
+  for (let i = 0; i < text.length; i++) {
+    const open = text[i];
+    if (!['[', '('].includes(open) || /[\\[!\w]/.test(text[i - 1] ?? '') || text[i + 1] === '[') continue;
+    if (ranges.some(r => i >= r.start && i < r.end)) continue;
+    const close = open === '[' ? ']' : ')';
+    let depth = 1, end = i + 1;
+    for (; end < text.length && end - i < 10000; end++) {
+      if (text[end - 1] === '\\') continue;
+      if (text[end] === open) depth++;
+      if (text[end] === close) { depth--; if (depth === 0) break; }
+    }
+    if (depth !== 0) continue;
+    if (open === '[' && ['(', '[', ':'].includes(text[end + 1])) { i = end; continue; }
+    const body = text.slice(i + 1, end).trim().replace(/\u00a0/g, ' ');
+    const strongMath = latex.test(body) || /^(?:[A-Za-z]_[A-Za-z0-9]+|[A-Za-z])\([^()\n]+\)$/.test(body);
+    if (!strongMath || /[\u3400-\u9fff]/.test(body.replace(/\\text\{[^}]*\}/g, '')) || ranges.some(r => i < r.end && end + 1 > r.start)) continue;
+    let braces = 0;
+    for (let j = 0; j < body.length; j++) {
+      if (body[j - 1] === '\\') continue;
+      if (body[j] === '{') braces++;
+      if (body[j] === '}' && --braces < 0) break;
+    }
+    if (braces !== 0) continue;
+    const inline = body.replace(/\r?\n/g, ' ');
+    const value = open === '[' && !tableCell ? displayMath(text, i, end + 1, body)
+      : `$${tableCell ? inline.replace(/(?<!\\)\|/g, '\\|') : inline}$`;
+    changes.push({ start: i, end: end + 1, value }); i = end;
+  }
+  for (const change of changes.reverse()) text = text.slice(0, change.start) + change.value + text.slice(change.end);
+  return text;
+}
+
 export function convertMath(text: string, tableCell = false): string {
   const protectedSpans = protectedRanges(text);
-  return text.replace(/(?<!\\)\\\(([\s\S]*?)(?<!\\)\\\)|(?<!\\)\\\[([\s\S]*?)(?<!\\)\\\]/g,
+  const converted = text.replace(/(?<!\\)\\\(([\s\S]*?)(?<!\\)\\\)|(?<!\\)\\\[([\s\S]*?)(?<!\\)\\\]/g,
     (whole, inline: string | undefined, display: string | undefined, offset: number) => {
       if (protectedSpans.some(r => offset < r.end && offset + whole.length > r.start)) return whole;
       const body = (inline ?? display ?? '').trim();
@@ -17,6 +60,7 @@ export function convertMath(text: string, tableCell = false): string {
       const before = text.slice(0, offset), after = text.slice(offset + whole.length);
       return `${before && !before.endsWith('\n\n') ? (before.endsWith('\n') ? '\n' : '\n\n') : ''}$$\n${body}\n$$${after && !after.startsWith('\n\n') ? (after.startsWith('\n') ? '\n' : '\n\n') : ''}`;
     });
+  return repairMathDelimiters(converted, tableCell);
 }
 
 function markdownMath(text: string): string {
@@ -75,7 +119,8 @@ export function convertClipboard(text: string, html = ''): Conversion {
   for (const node of [...doc.querySelectorAll('p,li,td,th,div,span')].reverse()) {
     for (const child of [...node.childNodes]) {
       if (child.nodeType !== 3 || node.closest('pre,code')) continue;
-      child.textContent = (child.textContent ?? '').replace(/(?<!\\)\\\([\s\S]*?\\\)|(?<!\\)\\\[[\s\S]*?\\\]/g, match => token(convertMath(match, !!node.closest('td,th'))));
+      child.textContent = convertMath(child.textContent ?? '', !!node.closest('td,th'))
+        .replace(/\$\$[\s\S]*?\$\$|\$[^\n]+?\$/g, match => token(match));
     }
   }
   for (const table of tables) {

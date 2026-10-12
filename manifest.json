@@ -1,7 +1,7 @@
 {
   "id": "vault-bridge",
   "name": "VaultBridge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "minAppVersion": "1.7.2",
   "description": "复制本地路径，携带附件跨库复制笔记，自动转换粘贴的公式与表格。",
   "author": "Yanlu Wang",
