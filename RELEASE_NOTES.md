@@ -1,10 +1,19 @@
-VaultBridge（库桥）0.2.0：
+# VaultBridge 0.2.1
 
-- 修复分隔符反斜杠丢失的公式，例如 `[ \boxed{...} ]` 和 `(P(\theta))`；新增“修复当前笔记的公式”命令，已有笔记可一次修复并撤销。
-- 自动发现 Obsidian 已登记的 Vault，点击目标库即可复制；支持直接浏览目标文件夹，预览改为可选，适配窄窗口和长路径。
-- 支持文件列表多选复制，统一处理共享附件、链接和重名。
-- 新增跨 Vault 窗口拖拽复制（实验性）：两边均需启用新版插件，拖到目标库左侧文件列表后松开；源文件保留。同库拖动沿用原有行为。
+## English
 
-下载 `vault-bridge-0.2.0.zip`，将其中的 `vault-bridge` 文件夹放入 Vault 的 `.obsidian/plugins/`。升级时替换 `main.js`、`manifest.json`、`styles.css`，保留原有 `data.json`，然后重新加载插件或重启 Obsidian。需 Obsidian 1.7.2+ 桌面版。跨库拖拽需两个 Vault 都升级。
+- Add complete English and Simplified Chinese documentation, linked to [FrankWangTHU/vault-bridge](https://github.com/FrankWangTHU/vault-bridge).
+- Use a concise English directory description and disclose local filesystem access.
+- Include bundled dependency licenses in the JavaScript and installation archive.
+- Existing copy and formula-repair behavior is unchanged. The interface is currently Chinese; cross-window dragging remains experimental and has not been verified in the real application.
 
-本地自动测试覆盖截图公式、复制界面、拖拽事件与临时 Vault 复制；真实 Obsidian 跨窗口拖拽、阅读视图渲染和真实 ChatGPT 剪贴板的端到端验收仍待完成。拖拽不可用时请使用右键复制。升级不会自动改写已有笔记，请运行修复命令处理旧内容。其他支持边界见 README 与 TESTING。
+Download `vault-bridge-0.2.1.zip`. Extract its `vault-bridge` folder into `.obsidian/plugins/`, keep your existing `data.json`, and reload the plugin. Requires Obsidian 1.7.2+ on desktop. Community-directory submission has not yet been completed.
+
+## 简体中文
+
+- 新增完整英文和简体中文介绍，链接到 [FrankWangTHU/vault-bridge](https://github.com/FrankWangTHU/vault-bridge)。
+- 更新市场英文简介，明确本地文件访问范围。
+- 在 JavaScript 和安装包中保留第三方依赖许可。
+- 复制和公式修复功能保持不变；插件界面目前为中文，跨窗口拖拽仍为待实机验证的实验性功能。
+
+下载 `vault-bridge-0.2.1.zip`，将其中的文件夹放入 `.obsidian/plugins/`，保留原有 `data.json` 并重新加载插件。需要 Obsidian 1.7.2+ 桌面版。社区插件市场申请尚未完成提交。

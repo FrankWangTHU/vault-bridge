@@ -1,0 +1,41 @@
+# Community directory submission / 社区插件申请
+
+Status: materials prepared; not submitted or approved.
+
+状态：资料已准备，尚未提交或通过审核。
+
+## Repository / 仓库
+
+[https://github.com/FrankWangTHU/vault-bridge](https://github.com/FrankWangTHU/vault-bridge)
+
+Plugin ID: `vault-bridge` · Name: **VaultBridge** · Author: **Yanlu Wang** · License: **MIT** · Desktop only, Obsidian 1.7.2+.
+
+## English introduction
+
+VaultBridge helps you copy notes and their attachments between Obsidian vaults, copy local file paths, and repair math and tables pasted from ChatGPT or the web. Pick a registered vault and a destination folder, then copy without overwriting existing files. Links between copied files are updated, shared attachments are collected once, and the source stays intact. Formula repair works during paste or on existing notes, with undo support. Everything runs locally, without API keys or uploads.
+
+Documentation is available in English and Chinese; the plugin interface currently uses Chinese. Cross-window dragging is experimental and requires VaultBridge in both vaults.
+
+Source, downloads, and feedback: [FrankWangTHU/vault-bridge](https://github.com/FrankWangTHU/vault-bridge).
+
+## 中文介绍
+
+VaultBridge（库桥）让 Obsidian 笔记跨库复制更方便：自动识别已有 Vault，选好目标库和文件夹，即可将笔记连同附件一起复制，更新已复制文件之间的链接，并自动处理重名，不覆盖已有文件、不改动源笔记。右键可复制文件的本地绝对路径；从 ChatGPT 或网页粘贴的公式和表格可自动转换，也支持修复已有笔记并撤销。全部处理在本地完成，无需 API 密钥或上传内容。
+
+提供中英文说明，插件界面目前为中文。跨窗口拖拽为实验性功能，两个 Vault 都需启用插件。
+
+源码、下载和反馈：[FrankWangTHU/vault-bridge](https://github.com/FrankWangTHU/vault-bridge)。
+
+## Submission steps / 提交步骤
+
+Follow the current [official submission guide](https://docs.obsidian.md/Plugins/Releasing/Submit%20your%20plugin) and [account setup guide](https://docs.obsidian.md/community-directory/set-up-and-claim):
+
+1. Sign in at [community.obsidian.md](https://community.obsidian.md) with your Obsidian account. / 使用 Obsidian 账号登录。
+2. Connect the GitHub account **FrankWangTHU** in the community profile. / 在社区资料页关联 GitHub 账号。
+3. Open **Plugins → New plugin**, enter the repository URL above, and choose yourself as owner. / 新增插件，填写上述仓库地址，所有者选择自己。
+4. Review the developer policies and maintenance commitment, then submit. / 阅读开发者政策和维护承诺并提交。
+5. Resolve review feedback in the repository and publish a new version if required; publish the entry when eligible. / 根据审核反馈修改并发布新版本，通过后发布市场条目。
+
+The directory reads the manifest and README from the repository. The release tag must match the manifest version and include `main.js`, `manifest.json`, and `styles.css`. This file does not indicate that an application has already been submitted.
+
+目录会读取仓库的 manifest 和 README。Release 标签需与版本号一致，附带三个插件文件。本文件不代表申请已提交。

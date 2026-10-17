@@ -1,84 +1,99 @@
-# VaultBridge（库桥）
+# VaultBridge
 
-让 Obsidian 笔记在本地文件、不同 Vault 和聊天内容之间流转。适用于 **Obsidian 1.7.2 及以上桌面版**，中文界面。
+**Copy notes with their attachments between vaults, copy local file paths, and fix pasted math and tables.**
 
-## 安装
+[English](README.md) | [简体中文](README.zh-CN.md) · [GitHub repository](https://github.com/FrankWangTHU/vault-bridge) · [Downloads](https://github.com/FrankWangTHU/vault-bridge/releases) · [Report an issue](https://github.com/FrankWangTHU/vault-bridge/issues)
 
-1. 从 [Releases](https://github.com/FrankWangTHU/vault-bridge/releases) 下载 `vault-bridge-0.2.0.zip`，不要下载 GitHub 自动生成的 Source code 压缩包。
-2. 将压缩包里的 `vault-bridge` 文件夹放入你的 Vault 的 `.obsidian/plugins/` 目录。
-3. 确认 `.obsidian/plugins/vault-bridge/` 下直接包含 `main.js`、`manifest.json`、`styles.css`。
-4. 重启 Obsidian，在“设置 → 第三方插件”中允许使用第三方插件并启用 **VaultBridge**。
+VaultBridge is a desktop plugin for Obsidian 1.7.2 and later. It helps you move research notes and their attachments between vaults and turn copied ChatGPT or web content into readable Markdown. All processing happens locally, without an API key, account, telemetry, or uploads.
 
-也可以运行下方开发命令，从本地 `dist/` 获取同样的安装包。首版尚未上架社区插件市场。
+**Documentation is available in English and Chinese. The plugin interface currently uses Chinese.** Cross-window drag-and-drop is experimental; the context-menu copy workflow is also available.
 
-## 使用
+## Features
 
-### 复制本地路径
+- **Copy an absolute path.** Right-click a file or folder to copy its native local path. There is also a command for the active note.
+- **Copy notes with attachments.** Select one or more notes or folders, pick a destination vault, and copy. VaultBridge discovers vaults registered with Obsidian and lets you browse destination folders.
+- **Keep links working.** Copied files receive updated links; shared attachments are copied once. Name conflicts receive numbered filenames, without overwriting existing files or modifying the source.
+- **Repair math and tables.** Convert LaTeX delimiters and ordinary HTML tables during paste. Repair an existing selection or the current note with a command.
 
-右键文件或文件夹，选择“复制本地绝对路径”。也可在命令面板运行“VaultBridge: 复制当前文件本地路径”。复制结果是系统原生绝对路径，包含文件扩展名，可直接用于其他应用。
+## Installation
 
-### 携带附件复制到其他 Vault
+The plugin is **not yet listed in the community directory**. Until the submission is completed and approved, install it from GitHub:
 
-1. 保存正在编辑的笔记，右键笔记或文件夹，选择“复制到其他 Vault…”。
-2. 窗口自动列出 Obsidian 已登记的其他 Vault，点击目标库即可；不必填写名称或路径。目标库不必打开，但需已有 `.obsidian` 文件夹。
-3. 默认放到库根目录；点击“选择文件夹…”可直接浏览目标库的文件夹。上次选择的库和目录会被记住。
-4. 点击“复制到…”。无需先预览；想检查文件去向时可点击“查看明细”。源文件和目标已有文件保持原样，复制后会列出未迁移链接等提示。
+1. Download `vault-bridge-0.2.1.zip` from [Releases](https://github.com/FrankWangTHU/vault-bridge/releases). Do not use the automatically generated Source code archive.
+2. Extract the `vault-bridge` folder into your vault's `.obsidian/plugins/` directory.
+3. Verify that `main.js`, `manifest.json`, and `styles.css` are directly inside `.obsidian/plugins/vault-bridge/`.
+4. Restart Obsidian and enable VaultBridge in **Settings → Community plugins**.
 
-支持在文件列表中多选后右键复制。找不到目标库时，先在 Obsidian 中打开一次该库，或展开窗口底部“手动添加”。自动发现读取本机 Obsidian 的 `obsidian.json` 登记信息，不扫描整块磁盘；该内部格式若随 Obsidian 更新变化，可使用手动添加。
+To upgrade, replace the plugin files and keep your existing `data.json`. Reload the plugin or restart Obsidian. Upgrading does not modify existing notes.
 
-例如，将 `项目/笔记.md` 导入另一个库的 `研究` 目录：
+## Copy a file path
 
-```text
-目标库/
-  研究/
-    笔记.md
-    _attachments/vault-bridge/
-      图片.png
-      论文.pdf
-```
+Right-click a file or folder and choose **复制本地绝对路径** (Copy local absolute path). For the active note, use **复制当前文件本地路径** in the command palette. The copied path includes the file extension and uses your operating system's native format.
 
-复制文件夹时保留该文件夹名称、内部层级和空目录。位于文件夹内部的附件保留原位置，引用的外部附件放入 `_attachments/vault-bridge/`。共享附件只复制一次，不同来源的同名附件分别保存。同名文件增加 ` (1)`、` (2)` 等序号，笔记内链接随之更新。
+## Copy to another vault
 
-支持 `[[笔记|别名]]`、`![[图片.png|300]]`、标题/块定位、PDF 页码，以及普通和引用式 Markdown 链接。复制后的双链使用目标库内完整路径；Markdown 链接使用相对路径。仅改写复制范围内的链接，未复制的其他笔记链接保留并提示，它们在目标库中可能指向同名笔记。
+1. Save your edits. Select notes or a folder in the file explorer, then choose **复制到其他 Vault…** (Copy to another vault) from the context menu.
+2. Click the destination vault. Registered vaults appear automatically, including closed vaults that are available on disk.
+3. Use **选择文件夹…** (Choose folder) to browse the destination, or keep the vault root. The last vault and folder are remembered.
+4. Click **复制到…** (Copy to). **查看明细** (View details) is an optional preview. Any unresolved attachment or uncopied note links are reported.
 
-### 拖到另一个 Vault 的左侧文件列表（实验性）
+If a vault is missing, open it once with Obsidian or expand the manual-add section. Destination vaults must have a default `.obsidian` configuration folder.
 
-两边都安装并启用 0.2.0 或更新版 VaultBridge，同时打开两个 Vault 窗口。从源库左侧文件列表拖出笔记、文件夹或多个选中项，放到目标库左侧文件夹上，即复制到该文件夹；放到笔记上则复制到它所在的文件夹，放到列表根区域则复制到库根目录。自动携带附件并改写链接，源文件保留。
+### Attachment and link rules
 
-只有在另一个 Vault 的文件列表内松开鼠标才触发复制；仅拖出窗口不会复制。库内拖动保持 Obsidian 原有行为。目标库未启用新版插件时，插件无法接管该窗口。此功能依赖 Obsidian 文件列表结构及桌面跨窗口拖拽机制，已验证模拟事件，尚未通过真实跨窗口操作验收；失败时可使用右键复制。设置中可关闭跨库拖拽。
+Copying a folder preserves its name, hierarchy, internal attachments, and empty folders. Local attachments referenced outside the selected content are collected into `_attachments/vault-bridge/` under the destination folder. Shared attachments are copied once. Conflicts become `name (1).ext`, `name (2).ext`, and so on.
 
-### 粘贴公式与表格
+Wiki links, embeds, aliases, image widths, heading/block references, PDF page fragments, and ordinary/reference-style Markdown links are supported. Copied wiki links use full paths within the destination vault; Markdown links use relative paths. Links to other notes are not followed recursively. Uncopied links are left intact and reported; they may resolve to a different same-named note in the target vault.
 
-启用插件后，在 Markdown 编辑器正常粘贴即可自动识别：
+The source is never deleted or changed. Existing destination files are never overwritten. A failed copy attempts to remove only the files and empty folders created by that operation. Forced termination or disk errors can prevent complete rollback.
 
-- `\(x^2\)` → `$x^2$`。
-- `\[...\]` → 独立行的 `$$` 公式块。
-- 复制时分隔符反斜杠丢失的 `[ \boxed{...} ]`、`(P(\theta))`、`(P(D))` → 对应块公式或行内公式。只修复括号平衡且有明确数学特征的内容。
-- 网页复制的普通 HTML 表格 → Markdown 表格，包括单元格中的公式、竖线和换行。
-- HTML 中携带 LaTeX 标注的 KaTeX/MathJax 公式 → 原始公式，避免视觉层和隐藏层重复出现。
+### Drag between vault windows (experimental)
 
-在插件设置中可以关闭自动转换。已经粘贴坏的笔记，可运行“VaultBridge: 修复当前笔记的公式”；也可选中一部分后运行“VaultBridge: 修复选中的公式和表格”。可在 Obsidian 快捷键设置中分配快捷键。转换以一次编辑写入，可使用撤销恢复；升级插件不会自动改写已有笔记。
+Enable VaultBridge 0.2.0 or later in both vaults. Drag notes, a folder, or multiple selected items from the source file explorer into the destination vault's file explorer:
 
-代码块、行内代码、笔记属性区和已有 `$...$` / `$$...$$` 公式受保护。普通文本、图片和文件粘贴不接管；不修改其他插件已经处理的粘贴事件。
+- Drop on a folder to copy into it.
+- Drop on a note to copy into that note's parent folder.
+- Drop on the root area to copy into the vault root.
 
-## 支持边界
+Only dropping into the other vault's file explorer triggers copying. Merely leaving the source window does not. Same-vault dragging keeps Obsidian's normal behavior. Disable cross-vault dragging in settings if needed.
 
-- 仅桌面端。优先在 Windows 开发，自动检查同时覆盖 Windows/Linux；macOS 和真实 Obsidian 界面仍需手动验收。
-- 跨库复制以已保存的 Markdown 笔记为基础，不递归复制其他关联笔记。属性区、原始 HTML 标签、Canvas、第三方插件文件内部的附件引用不解析；相关提示会在预览中出现。
-- 远程 URL 保持不变，不下载网页附件。不读取或复制 Vault 外部文件、符号链接、`.obsidian`、`.git`、`.trash` 或源库自定义配置目录。
-- 目标 Vault 使用默认 `.obsidian` 配置目录；源库支持自定义配置目录的排除。目标与源库不能相同或相互嵌套。
-- 文件重名自动改名；遇到文件夹路径被普通文件占用、大小写不一致的父目录等情况会要求修正目录后重新预览。预览后源文件或目标位置变化时停止复制，避免使用过期映射。
-- 复制失败会回滚本次新建文件，仅删除空的新建目录；异常断电或进程被强制退出无法保证自动回滚。磁盘或权限问题导致清理失败时会列出残留文件。
-- 不对公式图片或只有视觉文字、缺少 LaTeX 源码的公式做 OCR/猜测还原。合并单元格、嵌套表格不强行转换，会保留默认粘贴并提示。HTML 表格首行作为 Markdown 表头。
-- 仅剩纯文本的表格若已无行列结构，不能可靠还原；请使用网页复制保留 HTML 或复制 Markdown 原文。
+This feature depends on Obsidian's file explorer structure and desktop drag behavior. Simulated events have been tested; real cross-window operation has **not** been verified. Use the context-menu workflow if dragging does not work.
 
-## 隐私
+## Repair pasted math and tables
 
-无需账号、API 密钥或联网。转换和复制都在本机完成。目标库路径只保存在本地插件的 `data.json`，该文件已被 Git 忽略。插件不包含遥测或内容上传。
+Normal editor paste automatically recognizes:
 
-## 开发
+- `\(x^2\)` → `$x^2$`.
+- `\[...\]` → a display-math block with standalone `$$` delimiters.
+- Lost delimiter backslashes, such as `[ \boxed{...} ]`, `(P(\theta))`, or `(P(D))`, when balanced brackets contain clear mathematical syntax.
+- Ordinary HTML tables, including cell formulas, escaped pipes, and line breaks.
+- KaTeX/MathJax HTML containing LaTeX annotations, without duplicating visible and hidden math layers.
 
-使用 Node.js 22 和项目指定版本的 pnpm：
+For content already in a note, run **修复当前笔记的公式** (Repair math in current note). For selected text, run **修复选中的公式和表格** (Repair selected math and tables). Each conversion uses one editor change and can be undone once. Automatic conversion can be disabled in settings.
+
+Code blocks, inline code, frontmatter, and existing dollar-delimited math are protected. File/image pastes and paste events already handled by another plugin are left alone.
+
+## Privacy and filesystem access
+
+No network requests, payments, accounts, or API keys are required by the plugin. It has no telemetry.
+
+To discover your vaults, VaultBridge reads **Obsidian's application-level `obsidian.json` registry outside the current vault**. It does not scan your disk. It also reads the selected source files and attachments, lists folders in the chosen destination vault, and writes copies there. Personal paths and destination preferences are saved only in the plugin's local `data.json`, which is excluded from this repository.
+
+The registry is an internal Obsidian format; if it changes, use manual entry. Source files outside the source vault, symbolic links, configuration folders, `.git`, and `.trash` are excluded from copying.
+
+## Limitations and verification
+
+- Desktop only. Automated checks run on Windows and Linux; macOS and real Obsidian UI acceptance testing remain outstanding.
+- Copies use saved files. Save edits before copying or dragging.
+- No dependency parsing inside frontmatter, raw HTML, Canvas, or third-party plugin files. Such files are copied as ordinary files where applicable.
+- Remote attachments are not downloaded. Source and destination vaults cannot be identical or nested.
+- Math images and visual-only formulas without LaTeX source are not reconstructed. Merged or nested HTML tables retain normal paste behavior with a notice. The first table row becomes the Markdown header.
+- Plain text that has lost its table structure cannot reliably be restored.
+- Automated tests cover representative clipboard HTML and simulated UI events; they do not substitute for real ChatGPT clipboard or Obsidian rendering/drag tests. See [TESTING.md](TESTING.md).
+
+## Development
+
+Use Node.js 22 and the pnpm version specified in `package.json`:
 
 ```sh
 corepack enable
@@ -87,10 +102,16 @@ pnpm check
 pnpm package
 ```
 
-`pnpm dev` 开启构建监听。`pnpm check` 依次进行 TypeScript 检查、Vitest 测试和 esbuild 构建。`pnpm package` 生成安装文件夹与 ZIP。
+`pnpm dev` watches source changes. `pnpm check` runs TypeScript checking, tests, and a build. `pnpm package` creates the installable ZIP in `dist/`.
 
-主要模块：`src/main.ts` 负责 Obsidian 菜单、设置与事件；`src/ui.ts` 负责复制和文件夹选择窗口；`src/vaults.ts` 负责发现已登记的库；`src/drag.ts` 负责拖拽协议和位置识别；`src/copy.ts` 负责复制规划与执行；`src/format.ts` 负责剪贴板转换。Markdown 解析与保护范围单独封装，测试使用临时目录，不访问真实 Vault。
+Source modules separate event integration, UI, vault discovery, dragging, copy planning/execution, and content conversion. File-copy tests use temporary vaults, not personal notes.
 
-每次推送运行 Windows/Linux 自动检查；推送与 manifest 版本一致的标签（例如 `0.2.0`）时，发布流程先检查再生成 GitHub Release，附带安装 ZIP 和三个插件文件。
+## Links and license
 
-手动验收方法见 [TESTING.md](TESTING.md)。MIT License。
+Created by **Yanlu Wang / [FrankWangTHU](https://github.com/FrankWangTHU)**.
+
+- [Project: FrankWangTHU/vault-bridge](https://github.com/FrankWangTHU/vault-bridge)
+- [Downloads and release notes](https://github.com/FrankWangTHU/vault-bridge/releases)
+- [Bug reports and feature requests](https://github.com/FrankWangTHU/vault-bridge/issues)
+
+[MIT License](LICENSE). Bundled dependency licenses are included in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and the built JavaScript.
