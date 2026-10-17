@@ -8,7 +8,9 @@ Status: materials prepared; not submitted or approved.
 
 [https://github.com/FrankWangTHU/vault-bridge](https://github.com/FrankWangTHU/vault-bridge)
 
-Plugin ID: `vault-bridge` · Name: **VaultBridge** · Author: **Yanlu Wang** · License: **MIT** · Desktop only, Obsidian 1.7.2+.
+Plugin ID: `vault-bridge-toolkit` · Name: **VaultBridge Toolkit** · Author: **Yanlu Wang** · License: **MIT** · Desktop only, Obsidian 1.7.2+.
+
+The earlier ID `vault-bridge` is occupied by another author's plugin. Version 0.2.2 uses this distinct ID; the GitHub repository URL is unchanged. / 原标识被另一位作者占用，0.2.2 已改用独立标识，仓库地址不变。
 
 ## English introduction
 

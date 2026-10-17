@@ -1,4 +1,4 @@
-# VaultBridge（库桥）
+# VaultBridge Toolkit（库桥工具箱）
 
 [English](README.md) | [简体中文](README.zh-CN.md) · [项目仓库](https://github.com/FrankWangTHU/vault-bridge) · [下载](https://github.com/FrankWangTHU/vault-bridge/releases) · [反馈问题](https://github.com/FrankWangTHU/vault-bridge/issues)
 
@@ -6,10 +6,12 @@
 
 ## 安装
 
-1. 从 [Releases](https://github.com/FrankWangTHU/vault-bridge/releases) 下载 `vault-bridge-0.2.1.zip`，不要下载 GitHub 自动生成的 Source code 压缩包。
-2. 将压缩包里的 `vault-bridge` 文件夹放入你的 Vault 的 `.obsidian/plugins/` 目录。
-3. 确认 `.obsidian/plugins/vault-bridge/` 下直接包含 `main.js`、`manifest.json`、`styles.css`。
-4. 重启 Obsidian，在“设置 → 第三方插件”中允许使用第三方插件并启用 **VaultBridge**。
+1. 从 [Releases](https://github.com/FrankWangTHU/vault-bridge/releases) 下载 `vault-bridge-toolkit-0.2.2.zip`，不要下载 GitHub 自动生成的 Source code 压缩包。
+2. 将压缩包里的 `vault-bridge-toolkit` 文件夹放入你的 Vault 的 `.obsidian/plugins/` 目录。
+3. 确认 `.obsidian/plugins/vault-bridge-toolkit/` 下直接包含 `main.js`、`manifest.json`、`styles.css`。
+4. 重启 Obsidian，在“设置 → 第三方插件”中允许使用第三方插件并启用 **VaultBridge Toolkit**。
+
+**从 0.2.1 或更早版本升级：**原标识 `vault-bridge` 已被其他作者的社区插件占用，本项目改用 `vault-bridge-toolkit`，GitHub 地址保持不变。请先禁用本项目的旧安装，再安装新文件夹；如需保留偏好，在启用前将自己的旧 `data.json` 复制到新文件夹。不要同时启用两份插件，原有自定义快捷键需重新分配。不要把市场上另一位作者的“Vault Bridge”当作本项目更新安装。已有笔记及附件路径不受影响。
 
 也可以运行下方开发命令，从本地 `dist/` 获取同样的安装包。目前尚未上架社区插件市场，提交和审核完成前请使用 GitHub 安装包。中英文介绍均已提供；插件界面目前为中文。
 

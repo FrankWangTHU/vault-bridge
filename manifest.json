@@ -1,7 +1,7 @@
 {
-  "id": "vault-bridge",
-  "name": "VaultBridge",
-  "version": "0.2.1",
+  "id": "vault-bridge-toolkit",
+  "name": "VaultBridge Toolkit",
+  "version": "0.2.2",
   "minAppVersion": "1.7.2",
   "description": "Copy local file paths, copy notes and attachments between vaults, and repair pasted math and tables.",
   "author": "Yanlu Wang",

@@ -1,4 +1,4 @@
-# VaultBridge
+# VaultBridge Toolkit
 
 **Copy notes with their attachments between vaults, copy local file paths, and fix pasted math and tables.**
 
@@ -19,12 +19,14 @@ VaultBridge is a desktop plugin for Obsidian 1.7.2 and later. It helps you move 
 
 The plugin is **not yet listed in the community directory**. Until the submission is completed and approved, install it from GitHub:
 
-1. Download `vault-bridge-0.2.1.zip` from [Releases](https://github.com/FrankWangTHU/vault-bridge/releases). Do not use the automatically generated Source code archive.
-2. Extract the `vault-bridge` folder into your vault's `.obsidian/plugins/` directory.
-3. Verify that `main.js`, `manifest.json`, and `styles.css` are directly inside `.obsidian/plugins/vault-bridge/`.
-4. Restart Obsidian and enable VaultBridge in **Settings → Community plugins**.
+1. Download `vault-bridge-toolkit-0.2.2.zip` from [Releases](https://github.com/FrankWangTHU/vault-bridge/releases). Do not use the automatically generated Source code archive.
+2. Extract the `vault-bridge-toolkit` folder into your vault's `.obsidian/plugins/` directory.
+3. Verify that `main.js`, `manifest.json`, and `styles.css` are directly inside `.obsidian/plugins/vault-bridge-toolkit/`.
+4. Restart Obsidian and enable VaultBridge Toolkit in **Settings → Community plugins**.
 
 To upgrade, replace the plugin files and keep your existing `data.json`. Reload the plugin or restart Obsidian. Upgrading does not modify existing notes.
+
+**Upgrading from 0.2.1 or earlier:** the old `vault-bridge` ID belongs to a different author's community plugin. This project now uses `vault-bridge-toolkit`; its GitHub repository stays the same. Disable this project's old installation, install the new folder, and optionally copy your own old `data.json` into the new folder before enabling it. Do not enable both copies. Reassign custom hotkeys to the new plugin commands. Do not install the unrelated community entry named “Vault Bridge” as an update to this project. Existing note and attachment paths are unchanged.
 
 ## Copy a file path
 

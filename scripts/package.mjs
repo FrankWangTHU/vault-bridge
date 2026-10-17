@@ -2,11 +2,12 @@ import fs from 'node:fs/promises';
 import JSZip from 'jszip';
 const manifest = JSON.parse(await fs.readFile('manifest.json', 'utf8'));
 const zip = new JSZip();
-await fs.mkdir('dist/vault-bridge', { recursive: true });
+const folder = `dist/${manifest.id}`;
+await fs.mkdir(folder, { recursive: true });
 for (const name of ['main.js', 'manifest.json', 'styles.css', 'LICENSE', 'THIRD_PARTY_NOTICES.md']) {
   const content = await fs.readFile(name);
-  await fs.writeFile(`dist/vault-bridge/${name}`, content);
-  zip.file(`vault-bridge/${name}`, content);
+  await fs.writeFile(`${folder}/${name}`, content);
+  zip.file(`${manifest.id}/${name}`, content);
 }
-await fs.writeFile(`dist/vault-bridge-${manifest.version}.zip`, await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' }));
-console.log(`Created dist/vault-bridge-${manifest.version}.zip`);
+await fs.writeFile(`dist/${manifest.id}-${manifest.version}.zip`, await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' }));
+console.log(`Created dist/${manifest.id}-${manifest.version}.zip`);
