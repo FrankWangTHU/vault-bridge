@@ -2,11 +2,20 @@
 
 **跨库复制，附件随行；粘贴公式与表格，自动修复。**
 
-像寄送包裹一样，把笔记和附件一起带到另一个库，也让复制来的研究内容保持可读。项目从 0.2.3 起由 **VaultBridge Toolkit（库桥工具箱）** 更名为 **NoteParcel（笔记包裹）**。插件标识 `vault-bridge-toolkit`、安装目录、设置、命令标识及仓库地址保持不变，0.2.2 用户可直接覆盖更新。
+NoteParcel 让研究资料更方便地复用：将选中的笔记连同附件复制到另一个 Vault，自动更新已复制文件之间的链接；把 ChatGPT 或网页中的公式、表格转为可读的 Markdown；需要在其他应用引用文件时，右键即可复制本地路径。
 
 [English](README.md) | [简体中文](README.zh-CN.md) · [项目仓库](https://github.com/FrankWangTHU/vault-bridge) · [下载](https://github.com/FrankWangTHU/vault-bridge/releases) · [反馈问题](https://github.com/FrankWangTHU/vault-bridge/issues)
 
-让 Obsidian 笔记在本地文件、不同 Vault 和聊天内容之间流转。适用于 **Obsidian 1.7.2 及以上桌面版**，中文界面。
+适用于 **Obsidian 1.7.2 及以上桌面版**，中文界面。全部在本地处理，无需 API 密钥或账号，不采集遥测、不上传内容。
+
+## 主要功能
+
+- **跨库复制，附件随行：**选择笔记或文件夹，选好目标库和目录，即可一起复制相关附件。
+- **链接保持可用：**更新已复制文件间的链接，共享附件仅复制一次，重名自动编号，不改动源文件、不覆盖目标已有文件。
+- **公式与表格修复：**粘贴时自动转换支持的 LaTeX 分隔符和 HTML 表格，也可修复选区或当前笔记，支持撤销。
+- **复制本地路径：**右键文件或文件夹即可复制绝对路径，也支持当前笔记命令。
+
+跨窗口拖拽仍为**实验性功能**；如无法正常工作，请使用右键菜单复制。
 
 ## 安装
 
@@ -18,6 +27,8 @@
 2. 将压缩包里的 `vault-bridge-toolkit` 文件夹放入你的 Vault 的 `.obsidian/plugins/` 目录。
 3. 确认 `.obsidian/plugins/vault-bridge-toolkit/` 下直接包含 `main.js`、`manifest.json`、`styles.css`。
 4. 重启 Obsidian，在“设置 → 第三方插件”中允许使用第三方插件并启用 **NoteParcel**。
+
+**更名与升级：**项目从 0.2.3 起由 **VaultBridge Toolkit（库桥工具箱）** 更名为 **NoteParcel（笔记包裹）**。插件标识 `vault-bridge-toolkit`、安装目录、设置、命令标识及仓库地址保持不变，0.2.2 用户可直接覆盖更新，保留 `data.json` 和已有快捷键。
 
 **从 0.2.1 或更早版本升级：**原标识 `vault-bridge` 已被其他作者的社区插件占用，本项目改用 `vault-bridge-toolkit`，GitHub 地址保持不变。请先禁用本项目的旧安装，再安装新文件夹；如需保留偏好，在启用前将自己的旧 `data.json` 复制到新文件夹。不要同时启用两份插件，原有自定义快捷键需重新分配。不要把市场上另一位作者的“Vault Bridge”当作本项目更新安装。已有笔记及附件路径不受影响。
 

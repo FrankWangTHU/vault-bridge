@@ -1,27 +1,37 @@
-# NoteParcel
+# NoteParcel · 笔记包裹
 
-**Cross-vault copies with attachments. Clean math and table pastes. Local file paths at a click.**
+**Copy notes across vaults, with attachments and links intact. Repair pasted math and tables.**
 
-NoteParcel carries notes and their attachments together, like a parcel, and makes pasted research content readable. Formerly **VaultBridge Toolkit**, renamed in 0.2.3 to distinguish it from other plugins. The plugin ID `vault-bridge-toolkit`, installation folder, saved settings, command IDs, and GitHub repository remain the same; 0.2.2 users can update in place.
+**跨库复制，附件随行、链接保留；粘贴公式与表格，自动修复。**
 
 [English](README.md) | [简体中文](README.zh-CN.md) · [GitHub repository](https://github.com/FrankWangTHU/vault-bridge) · [Downloads](https://github.com/FrankWangTHU/vault-bridge/releases) · [Report an issue](https://github.com/FrankWangTHU/vault-bridge/issues)
 
-NoteParcel is a desktop plugin for Obsidian 1.7.2 and later. It helps you move research notes and their attachments between vaults and turn copied ChatGPT or web content into readable Markdown. All processing happens locally, without an API key, account, telemetry, or uploads.
+NoteParcel helps you reuse your research in Obsidian: copy selected notes and their attachments to another vault, update links between copied files, and turn math and tables from ChatGPT or the web into readable Markdown. Copy a local file path whenever you need to reference a note in another app.
 
-**Documentation is available in English and Chinese. The plugin interface currently uses Chinese.** Cross-window drag-and-drop is experimental; the context-menu copy workflow is also available.
+NoteParcel 让研究资料更方便地复用：将选中的笔记连同附件复制到另一个 Vault，自动更新已复制文件之间的链接；把 ChatGPT 或网页中的公式、表格转为可读的 Markdown；需要在其他应用引用文件时，右键即可复制本地路径。
 
-## Features
+**Desktop only · Obsidian 1.7.2+ · Chinese interface · All processing stays local.** No API key, account, telemetry, or uploads.
 
-- **Copy an absolute path.** Right-click a file or folder to copy its native local path. There is also a command for the active note.
-- **Copy notes with attachments.** Select one or more notes or folders, pick a destination vault, and copy. NoteParcel discovers vaults registered with Obsidian and lets you browse destination folders.
-- **Keep links working.** Copied files receive updated links; shared attachments are copied once. Name conflicts receive numbered filenames, without overwriting existing files or modifying the source.
-- **Repair math and tables.** Convert LaTeX delimiters and ordinary HTML tables during paste. Repair an existing selection or the current note with a command.
+**仅桌面端 · Obsidian 1.7.2 及以上 · 中文界面 · 全部在本地处理。** 无需 API 密钥或账号，不采集遥测、不上传内容。
 
-## Installation
+## Features / 主要功能
+
+- **Copy notes with attachments / 笔记与附件一起复制** — Select notes or folders, choose a registered vault and destination folder, then copy. 选择笔记或文件夹，选好已登记的目标库和目录，即可携带附件一起复制。
+- **Keep links and existing files safe / 保留链接，避免覆盖** — Update links between copied files, copy shared attachments once, and number conflicting filenames. 自动更新已复制文件间的链接，共享附件仅复制一次，重名文件自动编号；源文件和目标已有文件保持原样。
+- **Repair math and tables / 修复公式与表格** — Convert supported LaTeX delimiters and HTML tables during paste, or repair a selection or the current note with undo support. 粘贴时转换支持的 LaTeX 分隔符和 HTML 表格，也可修复选区或当前笔记，支持撤销；保护代码、笔记属性及已有公式。
+- **Copy local paths / 复制本地路径** — Right-click a file or folder to copy its absolute path, or use the command for the active note. 右键文件或文件夹复制绝对路径，也可通过命令复制当前笔记路径。
+
+Cross-window drag-and-drop is **experimental**. Use the context-menu copy workflow if it does not work in your setup.
+
+跨窗口拖拽仍为**实验性功能**；如无法正常工作，请使用右键菜单复制。
+
+## Installation / 安装
 
 Install **NoteParcel** from **Settings → Community plugins → Browse**, or open the [community listing](https://community.obsidian.md/plugins/vault-bridge-toolkit) and select **Add to Obsidian**.
 
-For manual installation from GitHub:
+在“设置 → 第三方插件 → 浏览”中搜索 **NoteParcel** 并安装，或打开[社区插件页面](https://community.obsidian.md/plugins/vault-bridge-toolkit)，点击 **Add to Obsidian**。详细中文操作步骤请见[完整中文指南](README.zh-CN.md)。
+
+For manual installation from GitHub / 从 GitHub 手动安装：
 
 1. Download `vault-bridge-toolkit-0.2.4.zip` from [Releases](https://github.com/FrankWangTHU/vault-bridge/releases). Do not use the automatically generated Source code archive.
 2. Extract the `vault-bridge-toolkit` folder into your vault's `.obsidian/plugins/` directory.
@@ -29,6 +39,8 @@ For manual installation from GitHub:
 4. Restart Obsidian and enable NoteParcel in **Settings → Community plugins**.
 
 To upgrade, replace the plugin files and keep your existing `data.json`. Reload the plugin or restart Obsidian. Upgrading does not modify existing notes.
+
+**Name change / 更名说明:** Formerly **VaultBridge Toolkit**, renamed in 0.2.3. The plugin ID `vault-bridge-toolkit`, installation folder, saved settings, command IDs, and GitHub repository remain the same; 0.2.2 users can update in place. 本项目原名“库桥工具箱”，现为“笔记包裹”；插件标识及安装目录保持不变，0.2.2 用户可直接升级并保留设置和快捷键。
 
 **Upgrading from 0.2.1 or earlier:** the old `vault-bridge` ID belongs to a different author's community plugin. This project now uses `vault-bridge-toolkit`; its GitHub repository stays the same. Disable this project's old installation, install the new folder, and optionally copy your own old `data.json` into the new folder before enabling it. Do not enable both copies. Reassign custom hotkeys to the new plugin commands. Do not install the unrelated community entry named “Vault Bridge” as an update to this project. Existing note and attachment paths are unchanged.
 
