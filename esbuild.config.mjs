@@ -5,7 +5,7 @@ const options = {
   entryPoints: ['src/main.ts'], bundle: true, outfile: 'main.js',
   format: 'cjs', platform: 'node', target: 'es2020',
   external: ['obsidian', 'electron'], sourcemap: false,
-  banner: { js: '/* VaultBridge | MIT | Yanlu Wang */' },
+  banner: { js: '/* NoteParcel | MIT | Yanlu Wang */' },
   metafile: true,
   plugins: [{ name: 'bundled-licenses', setup(build) {
     build.onEnd(async result => {

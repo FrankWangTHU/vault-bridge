@@ -20,7 +20,7 @@ export function parseDragPayload(raw: string): DragPayload {
   const data = JSON.parse(raw);
   if (data?.version !== 1 || typeof data.sourceRoot !== 'string' || typeof data.configDir !== 'string'
     || !Array.isArray(data.selections) || !data.selections.length || data.selections.length > 10000
-    || !data.resolved || typeof data.resolved !== 'object' || Array.isArray(data.resolved)) throw new Error('无法识别拖拽数据，请确认两边启用了新版 VaultBridge。');
+    || !data.resolved || typeof data.resolved !== 'object' || Array.isArray(data.resolved)) throw new Error('无法识别拖拽数据，请确认两边启用了新版 NoteParcel。');
   data.selections.forEach((p: unknown) => { if (typeof p !== 'string') throw new Error('文件路径无效'); safeRelative(p); });
   return data as DragPayload;
 }

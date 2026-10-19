@@ -1,21 +1,25 @@
-# VaultBridge Toolkit 0.2.2
+# NoteParcel 0.2.3
 
 ## English
 
-The community directory already has an unrelated plugin using the ID `vault-bridge`. This project now uses **VaultBridge Toolkit**, ID `vault-bridge-toolkit`. The repository remains [FrankWangTHU/vault-bridge](https://github.com/FrankWangTHU/vault-bridge).
+**VaultBridge Toolkit is now NoteParcel**: carry notes with their attachments between vaults, repair pasted math and tables, and copy local file paths. The new name distinguishes this plugin from unrelated Vault Bridge plugins.
 
-- Installation archives now derive their folder name from the manifest ID.
-- Existing copy, attachment, math, and table features are unchanged.
-- English and Chinese instructions explain migration from earlier manual installations.
+- Updated the plugin name, settings, notices, and bilingual documentation.
+- Replaced the settings heading with Obsidian's standard `Setting.setHeading()` component to fix the blocking community review error.
+- Kept plugin ID `vault-bridge-toolkit`, settings, command IDs, attachment paths, and the GitHub repository unchanged for compatibility.
 
-Download `vault-bridge-toolkit-0.2.2.zip`. Disable this project's old installation first. Extract the new folder into `.obsidian/plugins/`; optionally copy your old `data.json` into it before enabling. Reassign custom hotkeys. Do not enable both installations or install the unrelated “Vault Bridge” community entry as this project's update.
+Download `vault-bridge-toolkit-0.2.3.zip`, replace the files in your existing `.obsidian/plugins/vault-bridge-toolkit/` folder, keep `data.json`, and reload the plugin. Version 0.2.2 users do not need to migrate settings or hotkeys. Users of this project's 0.2.1 or earlier releases should follow the README migration instructions.
 
-The directory application is not yet approved. Cross-window dragging remains experimental.
+Community directory publication depends on the new review. Cross-window dragging remains experimental.
 
 ## 简体中文
 
-社区目录的原标识已被另一位作者使用，本项目现改名为 **VaultBridge Toolkit（库桥工具箱）**，使用 `vault-bridge-toolkit` 标识。你的[仓库地址](https://github.com/FrankWangTHU/vault-bridge)保持不变。
+**VaultBridge Toolkit 正式更名为 NoteParcel（笔记包裹）**：跨库复制笔记并携带附件，修复粘贴的公式和表格，复制本地路径。新名称便于与其他 Vault Bridge 插件区分。
 
-安装包目录与新标识一致，原有复制、附件、公式和表格功能保持不变。下载 `vault-bridge-toolkit-0.2.2.zip` 后，先禁用本项目的旧安装，再将新文件夹放入 `.obsidian/plugins/`。启用前可复制旧 `data.json` 以保留偏好，自定义快捷键需重新分配。不要同时启用两份插件，也不要把另一位作者的同名市场插件当成本项目更新。
+- 统一更新插件名称、设置页、提示和中英文说明。
+- 设置页标题改用 Obsidian 标准组件，修复社区自动审核的阻断错误。
+- 保留 `vault-bridge-toolkit` 标识、已有设置、命令标识、附件路径及 GitHub 仓库地址，确保升级兼容。
 
-市场申请尚未通过审核，跨窗口拖拽仍为实验性功能。
+下载 `vault-bridge-toolkit-0.2.3.zip`，覆盖原 `.obsidian/plugins/vault-bridge-toolkit/` 目录中的插件文件，保留 `data.json` 并重载插件。0.2.2 用户无需迁移设置或快捷键；本项目 0.2.1 及更早版本用户请按 README 的迁移说明升级。
+
+市场上架仍需新版本审核通过，跨窗口拖拽仍为实验性功能。

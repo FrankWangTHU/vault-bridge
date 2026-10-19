@@ -1,6 +1,6 @@
 import { App, Modal, Notice, Setting } from 'obsidian';
 import * as path from 'node:path';
-import type VaultBridge from './main';
+import type NoteParcel from './main';
 import { planCopy, type CopyPlan } from './copy';
 import { listTargetFolders, type TargetVault } from './vaults';
 const errorText = (e: unknown) => e instanceof Error ? e.message : String(e);
@@ -54,7 +54,7 @@ export class CopyModal extends Modal {
   private generation = 0;
   private closed = false;
   private busy = false;
-  constructor(app: App, private plugin: VaultBridge, private selections: string[]) { super(app); }
+  constructor(app: App, private plugin: NoteParcel, private selections: string[]) { super(app); }
   onOpen() { this.closed = false; void this.load(); }
   onClose() { this.closed = true; this.generation++; this.contentEl.empty(); }
   private async load() {
@@ -143,6 +143,6 @@ export class CopyModal extends Modal {
         addChoice(target).click(); advanced.open = false;
       } catch (error) { new Notice(errorText(error)); }
     }));
-    content.createEl('p', { text: '自动携带附件，重名自动改名，源文件保留。也可拖入另一个已启用 VaultBridge 的 Vault 文件列表。', cls: 'setting-item-description' });
+    content.createEl('p', { text: '自动携带附件，重名自动改名，源文件保留。也可拖入另一个已启用 NoteParcel 的 Vault 文件列表。', cls: 'setting-item-description' });
   }
 }

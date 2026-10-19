@@ -1,28 +1,28 @@
 # Community directory submission / 社区插件申请
 
-Status: materials prepared; not submitted or approved.
+Status (2026-10-19): submitted; version 0.2.2 failed an automated settings-heading check. Version 0.2.3 renames the plugin to NoteParcel and fixes the blocking error; a new review is required before publication.
 
-状态：资料已准备，尚未提交或通过审核。
+状态（2026-10-19）：已提交；0.2.2 未通过设置标题的自动检查。0.2.3 更名为 NoteParcel 并修复阻断错误，发布市场条目前需要重新审核。
 
 ## Repository / 仓库
 
 [https://github.com/FrankWangTHU/vault-bridge](https://github.com/FrankWangTHU/vault-bridge)
 
-Plugin ID: `vault-bridge-toolkit` · Name: **VaultBridge Toolkit** · Author: **Yanlu Wang** · License: **MIT** · Desktop only, Obsidian 1.7.2+.
+Plugin ID: `vault-bridge-toolkit` · Name: **NoteParcel** · Author: **Yanlu Wang** · License: **MIT** · Desktop only, Obsidian 1.7.2+.
 
 The earlier ID `vault-bridge` is occupied by another author's plugin. Version 0.2.2 uses this distinct ID; the GitHub repository URL is unchanged. / 原标识被另一位作者占用，0.2.2 已改用独立标识，仓库地址不变。
 
 ## English introduction
 
-VaultBridge helps you copy notes and their attachments between Obsidian vaults, copy local file paths, and repair math and tables pasted from ChatGPT or the web. Pick a registered vault and a destination folder, then copy without overwriting existing files. Links between copied files are updated, shared attachments are collected once, and the source stays intact. Formula repair works during paste or on existing notes, with undo support. Everything runs locally, without API keys or uploads.
+NoteParcel helps you copy notes and their attachments between Obsidian vaults, copy local file paths, and repair math and tables pasted from ChatGPT or the web. Pick a registered vault and a destination folder, then copy without overwriting existing files. Links between copied files are updated, shared attachments are collected once, and the source stays intact. Formula repair works during paste or on existing notes, with undo support. Everything runs locally, without API keys or uploads.
 
-Documentation is available in English and Chinese; the plugin interface currently uses Chinese. Cross-window dragging is experimental and requires VaultBridge in both vaults.
+Documentation is available in English and Chinese; the plugin interface currently uses Chinese. Cross-window dragging is experimental and requires NoteParcel in both vaults.
 
 Source, downloads, and feedback: [FrankWangTHU/vault-bridge](https://github.com/FrankWangTHU/vault-bridge).
 
 ## 中文介绍
 
-VaultBridge（库桥）让 Obsidian 笔记跨库复制更方便：自动识别已有 Vault，选好目标库和文件夹，即可将笔记连同附件一起复制，更新已复制文件之间的链接，并自动处理重名，不覆盖已有文件、不改动源笔记。右键可复制文件的本地绝对路径；从 ChatGPT 或网页粘贴的公式和表格可自动转换，也支持修复已有笔记并撤销。全部处理在本地完成，无需 API 密钥或上传内容。
+NoteParcel（笔记包裹）让 Obsidian 笔记跨库复制更方便：自动识别已有 Vault，选好目标库和文件夹，即可将笔记连同附件一起复制，更新已复制文件之间的链接，并自动处理重名，不覆盖已有文件、不改动源笔记。右键可复制文件的本地绝对路径；从 ChatGPT 或网页粘贴的公式和表格可自动转换，也支持修复已有笔记并撤销。全部处理在本地完成，无需 API 密钥或上传内容。
 
 提供中英文说明，插件界面目前为中文。跨窗口拖拽为实验性功能，两个 Vault 都需启用插件。
 
@@ -38,6 +38,6 @@ Follow the current [official submission guide](https://docs.obsidian.md/Plugins/
 4. Review the developer policies and maintenance commitment, then submit. / 阅读开发者政策和维护承诺并提交。
 5. Resolve review feedback in the repository and publish a new version if required; publish the entry when eligible. / 根据审核反馈修改并发布新版本，通过后发布市场条目。
 
-The directory reads the manifest and README from the repository. The release tag must match the manifest version and include `main.js`, `manifest.json`, and `styles.css`. This file does not indicate that an application has already been submitted.
+The directory reads the manifest and README from the repository. The release tag must match the manifest version and include `main.js`, `manifest.json`, and `styles.css`. Track the live review at [the plugin account page](https://community.obsidian.md/account/plugins/vault-bridge-toolkit).
 
-目录会读取仓库的 manifest 和 README。Release 标签需与版本号一致，附带三个插件文件。本文件不代表申请已提交。
+目录会读取仓库的 manifest 和 README。Release 标签需与版本号一致，附带三个插件文件。实际审核状态以插件后台为准。

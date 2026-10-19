@@ -1,9 +1,9 @@
 {
   "id": "vault-bridge-toolkit",
-  "name": "VaultBridge Toolkit",
-  "version": "0.2.2",
+  "name": "NoteParcel",
+  "version": "0.2.3",
   "minAppVersion": "1.7.2",
-  "description": "Copy local file paths, copy notes and attachments between vaults, and repair pasted math and tables.",
+  "description": "Copy notes with attachments between vaults, repair pasted math and tables, and copy local file paths.",
   "author": "Yanlu Wang",
   "authorUrl": "https://github.com/FrankWangTHU",
   "isDesktopOnly": true

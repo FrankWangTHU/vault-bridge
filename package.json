@@ -1,6 +1,6 @@
 {
-  "name": "vault-bridge",
-  "version": "0.2.2",
+  "name": "noteparcel",
+  "version": "0.2.3",
   "description": "Local paths, safe cross-vault copies, and math/table paste for Obsidian.",
   "private": true,
   "author": "Yanlu Wang",

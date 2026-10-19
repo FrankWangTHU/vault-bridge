@@ -1,17 +1,19 @@
-# VaultBridge Toolkit
+# NoteParcel
 
-**Copy notes with their attachments between vaults, copy local file paths, and fix pasted math and tables.**
+**Cross-vault copies with attachments. Clean math and table pastes. Local file paths at a click.**
+
+NoteParcel carries notes and their attachments together, like a parcel, and makes pasted research content readable. Formerly **VaultBridge Toolkit**, renamed in 0.2.3 to distinguish it from other plugins. The plugin ID `vault-bridge-toolkit`, installation folder, saved settings, command IDs, and GitHub repository remain the same; 0.2.2 users can update in place.
 
 [English](README.md) | [简体中文](README.zh-CN.md) · [GitHub repository](https://github.com/FrankWangTHU/vault-bridge) · [Downloads](https://github.com/FrankWangTHU/vault-bridge/releases) · [Report an issue](https://github.com/FrankWangTHU/vault-bridge/issues)
 
-VaultBridge is a desktop plugin for Obsidian 1.7.2 and later. It helps you move research notes and their attachments between vaults and turn copied ChatGPT or web content into readable Markdown. All processing happens locally, without an API key, account, telemetry, or uploads.
+NoteParcel is a desktop plugin for Obsidian 1.7.2 and later. It helps you move research notes and their attachments between vaults and turn copied ChatGPT or web content into readable Markdown. All processing happens locally, without an API key, account, telemetry, or uploads.
 
 **Documentation is available in English and Chinese. The plugin interface currently uses Chinese.** Cross-window drag-and-drop is experimental; the context-menu copy workflow is also available.
 
 ## Features
 
 - **Copy an absolute path.** Right-click a file or folder to copy its native local path. There is also a command for the active note.
-- **Copy notes with attachments.** Select one or more notes or folders, pick a destination vault, and copy. VaultBridge discovers vaults registered with Obsidian and lets you browse destination folders.
+- **Copy notes with attachments.** Select one or more notes or folders, pick a destination vault, and copy. NoteParcel discovers vaults registered with Obsidian and lets you browse destination folders.
 - **Keep links working.** Copied files receive updated links; shared attachments are copied once. Name conflicts receive numbered filenames, without overwriting existing files or modifying the source.
 - **Repair math and tables.** Convert LaTeX delimiters and ordinary HTML tables during paste. Repair an existing selection or the current note with a command.
 
@@ -19,10 +21,10 @@ VaultBridge is a desktop plugin for Obsidian 1.7.2 and later. It helps you move 
 
 The plugin is **not yet listed in the community directory**. Until the submission is completed and approved, install it from GitHub:
 
-1. Download `vault-bridge-toolkit-0.2.2.zip` from [Releases](https://github.com/FrankWangTHU/vault-bridge/releases). Do not use the automatically generated Source code archive.
+1. Download `vault-bridge-toolkit-0.2.3.zip` from [Releases](https://github.com/FrankWangTHU/vault-bridge/releases). Do not use the automatically generated Source code archive.
 2. Extract the `vault-bridge-toolkit` folder into your vault's `.obsidian/plugins/` directory.
 3. Verify that `main.js`, `manifest.json`, and `styles.css` are directly inside `.obsidian/plugins/vault-bridge-toolkit/`.
-4. Restart Obsidian and enable VaultBridge Toolkit in **Settings → Community plugins**.
+4. Restart Obsidian and enable NoteParcel in **Settings → Community plugins**.
 
 To upgrade, replace the plugin files and keep your existing `data.json`. Reload the plugin or restart Obsidian. Upgrading does not modify existing notes.
 
@@ -51,7 +53,7 @@ The source is never deleted or changed. Existing destination files are never ove
 
 ### Drag between vault windows (experimental)
 
-Enable VaultBridge 0.2.0 or later in both vaults. Drag notes, a folder, or multiple selected items from the source file explorer into the destination vault's file explorer:
+Enable NoteParcel in both vaults (drag support was introduced in VaultBridge 0.2.0). Drag notes, a folder, or multiple selected items from the source file explorer into the destination vault's file explorer:
 
 - Drop on a folder to copy into it.
 - Drop on a note to copy into that note's parent folder.
@@ -79,7 +81,7 @@ Code blocks, inline code, frontmatter, and existing dollar-delimited math are pr
 
 No network requests, payments, accounts, or API keys are required by the plugin. It has no telemetry.
 
-To discover your vaults, VaultBridge reads **Obsidian's application-level `obsidian.json` registry outside the current vault**. It does not scan your disk. It also reads the selected source files and attachments, lists folders in the chosen destination vault, and writes copies there. Personal paths and destination preferences are saved only in the plugin's local `data.json`, which is excluded from this repository.
+To discover your vaults, NoteParcel reads **Obsidian's application-level `obsidian.json` registry outside the current vault**. It does not scan your disk. It also reads the selected source files and attachments, lists folders in the chosen destination vault, and writes copies there. Personal paths and destination preferences are saved only in the plugin's local `data.json`, which is excluded from this repository.
 
 The registry is an internal Obsidian format; if it changes, use manual entry. Source files outside the source vault, symbolic links, configuration folders, `.git`, and `.trash` are excluded from copying.
 

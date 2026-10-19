@@ -1,4 +1,8 @@
-# VaultBridge Toolkit（库桥工具箱）
+# NoteParcel（笔记包裹）
+
+**跨库复制，附件随行；粘贴公式与表格，自动修复。**
+
+像寄送包裹一样，把笔记和附件一起带到另一个库，也让复制来的研究内容保持可读。项目从 0.2.3 起由 **VaultBridge Toolkit（库桥工具箱）** 更名为 **NoteParcel（笔记包裹）**。插件标识 `vault-bridge-toolkit`、安装目录、设置、命令标识及仓库地址保持不变，0.2.2 用户可直接覆盖更新。
 
 [English](README.md) | [简体中文](README.zh-CN.md) · [项目仓库](https://github.com/FrankWangTHU/vault-bridge) · [下载](https://github.com/FrankWangTHU/vault-bridge/releases) · [反馈问题](https://github.com/FrankWangTHU/vault-bridge/issues)
 
@@ -6,10 +10,10 @@
 
 ## 安装
 
-1. 从 [Releases](https://github.com/FrankWangTHU/vault-bridge/releases) 下载 `vault-bridge-toolkit-0.2.2.zip`，不要下载 GitHub 自动生成的 Source code 压缩包。
+1. 从 [Releases](https://github.com/FrankWangTHU/vault-bridge/releases) 下载 `vault-bridge-toolkit-0.2.3.zip`，不要下载 GitHub 自动生成的 Source code 压缩包。
 2. 将压缩包里的 `vault-bridge-toolkit` 文件夹放入你的 Vault 的 `.obsidian/plugins/` 目录。
 3. 确认 `.obsidian/plugins/vault-bridge-toolkit/` 下直接包含 `main.js`、`manifest.json`、`styles.css`。
-4. 重启 Obsidian，在“设置 → 第三方插件”中允许使用第三方插件并启用 **VaultBridge Toolkit**。
+4. 重启 Obsidian，在“设置 → 第三方插件”中允许使用第三方插件并启用 **NoteParcel**。
 
 **从 0.2.1 或更早版本升级：**原标识 `vault-bridge` 已被其他作者的社区插件占用，本项目改用 `vault-bridge-toolkit`，GitHub 地址保持不变。请先禁用本项目的旧安装，再安装新文件夹；如需保留偏好，在启用前将自己的旧 `data.json` 复制到新文件夹。不要同时启用两份插件，原有自定义快捷键需重新分配。不要把市场上另一位作者的“Vault Bridge”当作本项目更新安装。已有笔记及附件路径不受影响。
 
@@ -19,7 +23,7 @@
 
 ### 复制本地路径
 
-右键文件或文件夹，选择“复制本地绝对路径”。也可在命令面板运行“VaultBridge: 复制当前文件本地路径”。复制结果是系统原生绝对路径，包含文件扩展名，可直接用于其他应用。
+右键文件或文件夹，选择“复制本地绝对路径”。也可在命令面板运行“NoteParcel: 复制当前文件本地路径”。复制结果是系统原生绝对路径，包含文件扩展名，可直接用于其他应用。
 
 ### 携带附件复制到其他 Vault
 
@@ -47,7 +51,7 @@
 
 ### 拖到另一个 Vault 的左侧文件列表（实验性）
 
-两边都安装并启用 0.2.0 或更新版 VaultBridge，同时打开两个 Vault 窗口。从源库左侧文件列表拖出笔记、文件夹或多个选中项，放到目标库左侧文件夹上，即复制到该文件夹；放到笔记上则复制到它所在的文件夹，放到列表根区域则复制到库根目录。自动携带附件并改写链接，源文件保留。
+两边都安装并启用 0.2.0 或更新版 NoteParcel，同时打开两个 Vault 窗口。从源库左侧文件列表拖出笔记、文件夹或多个选中项，放到目标库左侧文件夹上，即复制到该文件夹；放到笔记上则复制到它所在的文件夹，放到列表根区域则复制到库根目录。自动携带附件并改写链接，源文件保留。
 
 只有在另一个 Vault 的文件列表内松开鼠标才触发复制；仅拖出窗口不会复制。库内拖动保持 Obsidian 原有行为。目标库未启用新版插件时，插件无法接管该窗口。此功能依赖 Obsidian 文件列表结构及桌面跨窗口拖拽机制，已验证模拟事件，尚未通过真实跨窗口操作验收；失败时可使用右键复制。设置中可关闭跨库拖拽。
 
@@ -61,7 +65,7 @@
 - 网页复制的普通 HTML 表格 → Markdown 表格，包括单元格中的公式、竖线和换行。
 - HTML 中携带 LaTeX 标注的 KaTeX/MathJax 公式 → 原始公式，避免视觉层和隐藏层重复出现。
 
-在插件设置中可以关闭自动转换。已经粘贴坏的笔记，可运行“VaultBridge: 修复当前笔记的公式”；也可选中一部分后运行“VaultBridge: 修复选中的公式和表格”。可在 Obsidian 快捷键设置中分配快捷键。转换以一次编辑写入，可使用撤销恢复；升级插件不会自动改写已有笔记。
+在插件设置中可以关闭自动转换。已经粘贴坏的笔记，可运行“NoteParcel: 修复当前笔记的公式”；也可选中一部分后运行“NoteParcel: 修复选中的公式和表格”。可在 Obsidian 快捷键设置中分配快捷键。转换以一次编辑写入，可使用撤销恢复；升级插件不会自动改写已有笔记。
 
 代码块、行内代码、笔记属性区和已有 `$...$` / `$$...$$` 公式受保护。普通文本、图片和文件粘贴不接管；不修改其他插件已经处理的粘贴事件。
 

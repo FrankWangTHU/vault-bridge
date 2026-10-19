@@ -1,15 +1,15 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import VaultBridge from '../src/main';
+import NoteParcel from '../src/main';
 import { FileSystemAdapter } from './mocks/obsidian';
 import * as path from 'node:path';
 import { DRAG_MIME, parseDragPayload, sourceType } from '../src/drag';
 
-let plugin: VaultBridge, handlers: Map<string, (...args: any[]) => void>;
+let plugin: NoteParcel, handlers: Map<string, (...args: any[]) => void>;
 beforeEach(async () => {
   handlers = new Map();
   const app = { workspace: { on: (event: string, callback: (...args: any[]) => void) => handlers.set(event, callback), iterateAllLeaves: () => {}, getActiveFile: () => ({ path: '中文 name.md' }) }, vault: { adapter: new FileSystemAdapter(path.resolve('vault')), configDir: '.obsidian', getMarkdownFiles: () => [] } };
-  plugin = new VaultBridge(app as any, {} as any);
+  plugin = new NoteParcel(app as any, {} as any);
   await plugin.onload();
 });
 function paste(text: string, { position = 0, document = '', files = 0, handled = false } = {}) {
