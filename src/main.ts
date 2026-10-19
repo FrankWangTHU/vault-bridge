@@ -140,7 +140,6 @@ class BridgeSettings extends PluginSettingTab {
   constructor(app: App, private plugin: NoteParcel) { super(app, plugin); }
   display() {
     const { containerEl } = this; containerEl.empty();
-    new Setting(containerEl).setName('NoteParcel（笔记包裹）').setHeading();
     new Setting(containerEl).setName('自动转换粘贴的公式和表格').setDesc('同时修复丢失反斜杠的公式分隔符；代码与属性区不转换。').addToggle(toggle => toggle.setValue(this.plugin.settings.autoConvert).onChange(async value => { this.plugin.settings.autoConvert = value; await this.plugin.saveSettings(); }));
     new Setting(containerEl).setName('跨 Vault 窗口拖拽复制').setDesc('两边均需启用新版 NoteParcel；拖到目标库左侧文件列表或文件夹即可复制，源文件保留。').addToggle(toggle => toggle.setValue(this.plugin.settings.crossVaultDrag).onChange(async value => { this.plugin.settings.crossVaultDrag = value; await this.plugin.saveSettings(); }));
     containerEl.createEl('p', { text: '复制窗口会自动读取 Obsidian 已登记的 Vault。未登记的库可以在复制窗口的“手动添加”中添加。' });

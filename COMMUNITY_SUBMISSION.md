@@ -1,8 +1,8 @@
 # Community directory submission / 社区插件申请
 
-Status (2026-10-19): submitted; version 0.2.2 failed an automated settings-heading check. Version 0.2.3 renames the plugin to NoteParcel and fixes the blocking error; a new review is required before publication.
+Status (2026-10-19): submitted; version 0.2.2 failed an automated settings-heading check. Version 0.2.3 renamed the plugin to NoteParcel; 0.2.4 removes the redundant plugin-name heading flagged by the next review. A new review is required before publication.
 
-状态（2026-10-19）：已提交；0.2.2 未通过设置标题的自动检查。0.2.3 更名为 NoteParcel 并修复阻断错误，发布市场条目前需要重新审核。
+状态（2026-10-19）：已提交；0.2.2 未通过设置标题的自动检查。0.2.3 更名为 NoteParcel；0.2.4 移除复审提示的重复插件名标题。发布市场条目前需要重新审核。
 
 ## Repository / 仓库
 

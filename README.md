@@ -21,7 +21,7 @@ NoteParcel is a desktop plugin for Obsidian 1.7.2 and later. It helps you move r
 
 The plugin is **not yet listed in the community directory**. Until the submission is completed and approved, install it from GitHub:
 
-1. Download `vault-bridge-toolkit-0.2.3.zip` from [Releases](https://github.com/FrankWangTHU/vault-bridge/releases). Do not use the automatically generated Source code archive.
+1. Download `vault-bridge-toolkit-0.2.4.zip` from [Releases](https://github.com/FrankWangTHU/vault-bridge/releases). Do not use the automatically generated Source code archive.
 2. Extract the `vault-bridge-toolkit` folder into your vault's `.obsidian/plugins/` directory.
 3. Verify that `main.js`, `manifest.json`, and `styles.css` are directly inside `.obsidian/plugins/vault-bridge-toolkit/`.
 4. Restart Obsidian and enable NoteParcel in **Settings → Community plugins**.
