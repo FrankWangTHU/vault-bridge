@@ -1,8 +1,8 @@
 # Community directory submission / 社区插件申请
 
-Status (2026-10-19): submitted; version 0.2.2 failed an automated settings-heading check. Version 0.2.3 renamed the plugin to NoteParcel; 0.2.4 removes the redundant plugin-name heading flagged by the next review. A new review is required before publication.
+Status (2026-10-19): NoteParcel 0.2.4 review completed, with no blocking errors. Build verification reproduced main.js byte-for-byte. The public listing's Add to Obsidian installation link is enabled. Non-blocking warnings remain; the review badge is Caution.
 
-状态（2026-10-19）：已提交；0.2.2 未通过设置标题的自动检查。0.2.3 更名为 NoteParcel；0.2.4 移除复审提示的重复插件名标题。发布市场条目前需要重新审核。
+状态（2026-10-19）：NoteParcel 0.2.4 已完成审核，无阻断错误，main.js 逐字节构建验证通过。市场页面的 Add to Obsidian 安装入口已开放。仍有非阻断警告，审核标记为 Caution。
 
 ## Repository / 仓库
 

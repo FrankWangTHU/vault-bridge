@@ -10,6 +10,10 @@
 
 ## 安装
 
+在 Obsidian 的“设置 → 第三方插件 → 浏览”中搜索 **NoteParcel** 并安装，或打开[社区插件页面](https://community.obsidian.md/plugins/vault-bridge-toolkit)，点击 **Add to Obsidian**。
+
+如需从 GitHub 手动安装：
+
 1. 从 [Releases](https://github.com/FrankWangTHU/vault-bridge/releases) 下载 `vault-bridge-toolkit-0.2.4.zip`，不要下载 GitHub 自动生成的 Source code 压缩包。
 2. 将压缩包里的 `vault-bridge-toolkit` 文件夹放入你的 Vault 的 `.obsidian/plugins/` 目录。
 3. 确认 `.obsidian/plugins/vault-bridge-toolkit/` 下直接包含 `main.js`、`manifest.json`、`styles.css`。
@@ -17,7 +21,7 @@
 
 **从 0.2.1 或更早版本升级：**原标识 `vault-bridge` 已被其他作者的社区插件占用，本项目改用 `vault-bridge-toolkit`，GitHub 地址保持不变。请先禁用本项目的旧安装，再安装新文件夹；如需保留偏好，在启用前将自己的旧 `data.json` 复制到新文件夹。不要同时启用两份插件，原有自定义快捷键需重新分配。不要把市场上另一位作者的“Vault Bridge”当作本项目更新安装。已有笔记及附件路径不受影响。
 
-也可以运行下方开发命令，从本地 `dist/` 获取同样的安装包。目前尚未上架社区插件市场，提交和审核完成前请使用 GitHub 安装包。中英文介绍均已提供；插件界面目前为中文。
+也可以运行下方开发命令，从本地 `dist/` 获取同样的安装包。0.2.4 已完成社区自动审核，市场安装入口已开放。中英文介绍均已提供；插件界面目前为中文。
 
 ## 使用
 
