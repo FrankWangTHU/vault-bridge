@@ -1,3 +1,4 @@
+import { createTranslator, LocalizedError, type Language } from './i18n';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import * as os from 'node:os';
@@ -23,16 +24,17 @@ export async function canonicalPath(value: string): Promise<string> {
 export function samePath(left: string, right: string): boolean {
   return process.platform === 'win32' ? path.resolve(left).toLowerCase() === path.resolve(right).toLowerCase() : path.resolve(left) === path.resolve(right);
 }
-export async function discoverVaults(current: string, saved: TargetVault[] = [], registry = registryPath()): Promise<{ vaults: TargetVault[]; warning?: string }> {
+export async function discoverVaults(current: string, saved: TargetVault[] = [], registry = registryPath(), language: Language = 'zh-CN'): Promise<{ vaults: TargetVault[]; warning?: string }> {
+  const t = createTranslator(language);
   const candidates: TargetVault[] = [];
   let warning: string | undefined;
   try {
     const json = JSON.parse(await fs.readFile(registry, 'utf8'));
-    if (!json.vaults || typeof json.vaults !== 'object') throw new Error('Vault 列表格式未知');
+    if (!json.vaults || typeof json.vaults !== 'object') throw new LocalizedError("Vault 列表格式未知");
     for (const value of Object.values(json.vaults) as any[]) {
       if (typeof value?.path === 'string' && path.isAbsolute(value.path)) candidates.push({ name: path.basename(value.path), path: value.path, destination: '', open: value.open === true });
     }
-  } catch { warning = '未能读取 Obsidian 的库列表，可手动添加目标库。'; }
+  } catch { warning = t("未能读取 Obsidian 的库列表，可手动添加目标库。"); }
   candidates.push(...saved);
   let own = current;
   try { own = await canonicalPath(current); } catch { /* Current adapter can be unavailable during startup. */ }
@@ -55,9 +57,10 @@ export async function listTargetFolders(root: string, current = ''): Promise<str
   let probe = root;
   for (const part of relative.split('/').filter(Boolean)) {
     probe = path.join(probe, part);
-    if ((await fs.lstat(probe)).isSymbolicLink()) throw new Error('不能选择符号链接文件夹。');
+    if ((await fs.lstat(probe)).isSymbolicLink()) throw new LocalizedError("不能选择符号链接文件夹。");
   }
   return (await fs.readdir(probe, { withFileTypes: true }))
     .filter(entry => entry.isDirectory() && !entry.isSymbolicLink() && !entry.name.startsWith('.'))
     .map(entry => relative ? `${relative}/${entry.name}` : entry.name).sort((a, b) => a.localeCompare(b));
 }
+

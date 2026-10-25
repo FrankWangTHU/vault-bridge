@@ -6,7 +6,7 @@
 
 研究库里整理好的资料，放进项目库还要重新找图片、搬 PDF、改链接？NoteParcel 帮你把选中的笔记和文件夹连同本地附件一起复制到另一个 Vault，自动更新已复制文件之间的链接。粘贴 ChatGPT 或网页中的公式与表格时，也能顺手修复支持的格式，让整理资料少一点打断。
 
-适用于 **Obsidian 1.7.2 及以上桌面版**，插件界面为中文。全部在本地处理，无需账号或 API 密钥，不采集遥测、不上传内容。
+适用于 **Obsidian 1.7.2 及以上桌面版**，界面支持简体中文与英文切换。全部在本地处理，无需账号或 API 密钥，不采集遥测、不上传内容。
 
 ## 少些整理，多些思考
 
@@ -20,13 +20,17 @@
 
 ⭐ **如果 NoteParcel 帮到了你，欢迎[在 GitHub 点一颗 Star](https://github.com/FrankWangTHU/vault-bridge)**，支持项目，也让更多 Obsidian 用户发现它。遇到问题或有新想法，也欢迎[提交反馈](https://github.com/FrankWangTHU/vault-bridge/issues)。
 
+## 界面语言
+
+打开“设置 → NoteParcel → 界面语言”，可选择“跟随 Obsidian / 简体中文 / English”。跟随模式下，Obsidian 为中文时使用简体中文，其他语言使用英文。右键菜单、命令面板、设置、复制窗口、进度与插件提示均已翻译。切换后设置页和命令立即更新，新打开的菜单与窗口使用所选语言；原有设置、快捷键、文件名和路径保持不变。
+
 ## 安装
 
 在 Obsidian 的“设置 → 第三方插件 → 浏览”中搜索 **NoteParcel** 并安装，或打开[社区插件页面](https://community.obsidian.md/plugins/vault-bridge-toolkit)，点击 **Add to Obsidian**。
 
 如需从 GitHub 手动安装：
 
-1. 从 [Releases](https://github.com/FrankWangTHU/vault-bridge/releases) 下载 `vault-bridge-toolkit-0.2.4.zip`，不要下载 GitHub 自动生成的 Source code 压缩包。
+1. 从 [Releases](https://github.com/FrankWangTHU/vault-bridge/releases) 下载 `vault-bridge-toolkit-0.2.5.zip`，不要下载 GitHub 自动生成的 Source code 压缩包。
 2. 将压缩包里的 `vault-bridge-toolkit` 文件夹放入你的 Vault 的 `.obsidian/plugins/` 目录。
 3. 确认 `.obsidian/plugins/vault-bridge-toolkit/` 下直接包含 `main.js`、`manifest.json`、`styles.css`。
 4. 重启 Obsidian，在“设置 → 第三方插件”中允许使用第三方插件并启用 **NoteParcel**。
@@ -35,7 +39,7 @@
 
 **从 0.2.1 或更早版本升级：**原标识 `vault-bridge` 已被其他作者的社区插件占用，本项目改用 `vault-bridge-toolkit`，GitHub 地址保持不变。请先禁用本项目的旧安装，再安装新文件夹；如需保留偏好，在启用前将自己的旧 `data.json` 复制到新文件夹。不要同时启用两份插件，原有自定义快捷键需重新分配。不要把市场上另一位作者的“Vault Bridge”当作本项目更新安装。已有笔记及附件路径不受影响。
 
-也可以运行下方开发命令，从本地 `dist/` 获取同样的安装包。0.2.4 已完成社区自动审核，市场安装入口已开放。中英文介绍均已提供；插件界面目前为中文。
+也可以运行下方开发命令，从本地 `dist/` 获取同样的安装包。0.2.4 已完成社区自动审核，市场安装入口已开放。中英文介绍均已提供；插件界面支持中英文切换。
 
 ## 使用
 
@@ -124,3 +128,4 @@ pnpm package
 手动验收方法见 [TESTING.md](TESTING.md)。MIT License。
 
 作者：**Yanlu Wang / [FrankWangTHU](https://github.com/FrankWangTHU)**。项目主页：[FrankWangTHU/vault-bridge](https://github.com/FrankWangTHU/vault-bridge)。第三方依赖许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)，同时保留在发布的 JavaScript 中。
+

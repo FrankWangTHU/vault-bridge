@@ -6,7 +6,7 @@
 
 Move research from one Obsidian vault to another without gathering attachments by hand. NoteParcel copies selected notes and folders, brings their local attachments, and updates links between copied files. Paste math and tables from ChatGPT or the web into a cleaner Markdown workflow, and copy local file paths whenever another app needs them.
 
-**Desktop only · Obsidian 1.7.2+ · Chinese plugin interface · Local processing.** No account, API key, telemetry, or content uploads.
+**Desktop only · Obsidian 1.7.2+ · English / Simplified Chinese interface · Local processing.** No account, API key, telemetry, or content uploads.
 
 ## Less cleanup. More time for your ideas.
 
@@ -20,6 +20,10 @@ Use it to bring research into a project vault, reuse a collection of notes, or k
 
 ⭐ **Finding NoteParcel useful? [Give it a Star on GitHub](https://github.com/FrankWangTHU/vault-bridge)** to support the project and help more Obsidian users discover it. Bug reports and suggestions are welcome, too.
 
+## Interface language
+
+Open **Settings → NoteParcel → Interface language** and choose **Follow Obsidian**, **简体中文**, or **English**. Automatic mode uses Simplified Chinese for Chinese Obsidian interfaces and English for other languages. Menus, commands, settings, copy dialogs, progress, and plugin notices are translated. Language changes take effect immediately for settings, commands, and newly opened menus/dialogs. Your settings, hotkeys, filenames, and paths are preserved.
+
 ## Installation
 
 Install **NoteParcel** from **Settings → Community plugins → Browse**, or open the [community listing](https://community.obsidian.md/plugins/vault-bridge-toolkit) and select **Add to Obsidian**.
@@ -28,7 +32,7 @@ Install **NoteParcel** from **Settings → Community plugins → Browse**, or op
 
 For manual installation from GitHub / 从 GitHub 手动安装：
 
-1. Download `vault-bridge-toolkit-0.2.4.zip` from [Releases](https://github.com/FrankWangTHU/vault-bridge/releases). Do not use the automatically generated Source code archive.
+1. Download `vault-bridge-toolkit-0.2.5.zip` from [Releases](https://github.com/FrankWangTHU/vault-bridge/releases). Do not use the automatically generated Source code archive.
 2. Extract the `vault-bridge-toolkit` folder into your vault's `.obsidian/plugins/` directory.
 3. Verify that `main.js`, `manifest.json`, and `styles.css` are directly inside `.obsidian/plugins/vault-bridge-toolkit/`.
 4. Restart Obsidian and enable NoteParcel in **Settings → Community plugins**.
@@ -128,3 +132,4 @@ Created by **Yanlu Wang / [FrankWangTHU](https://github.com/FrankWangTHU)**.
 - [Bug reports and feature requests](https://github.com/FrankWangTHU/vault-bridge/issues)
 
 [MIT License](LICENSE). Bundled dependency licenses are included in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and the built JavaScript.
+

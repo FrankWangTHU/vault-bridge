@@ -1,3 +1,4 @@
+import { createTranslator, type Language } from './i18n';
 import TurndownService from 'turndown';
 import { extractLinks, protectedRanges } from './markdown';
 
@@ -78,7 +79,8 @@ function markdownMath(text: string): string {
   }).join('\n');
 }
 
-export function convertClipboard(text: string, html = ''): Conversion {
+export function convertClipboard(text: string, html = '', language: Language = 'zh-CN'): Conversion {
+  const t = createTranslator(language);
   const warnings: string[] = [];
   const plain = () => {
     const converted = convertMath(markdownMath(text));
@@ -93,11 +95,11 @@ export function convertClipboard(text: string, html = ''): Conversion {
   if (!tables.length && !math.length) return plain();
   if (tables.some(t => t.querySelector('table') || [...t.querySelectorAll('th,td')].some(c =>
     Number(c.getAttribute('colspan') ?? 1) !== 1 || Number(c.getAttribute('rowspan') ?? 1) !== 1))) {
-    warnings.push('检测到合并单元格或嵌套表格，已保留原粘贴内容。');
+    warnings.push(t("检测到合并单元格或嵌套表格，已保留原粘贴内容。"));
     return { text, changed: false, warnings };
   }
   if (math.some(n => !n.getAttribute('data-tex') && !n.querySelector('annotation[encoding="application/x-tex"]')?.textContent)) {
-    warnings.push('部分公式没有 LaTeX 源码，已保留原粘贴内容。');
+    warnings.push(t("部分公式没有 LaTeX 源码，已保留原粘贴内容。"));
     return { text, changed: false, warnings };
   }
   const replacements = new Map<string, string>();
@@ -141,3 +143,4 @@ export function convertClipboard(text: string, html = ''): Conversion {
   const converted = restore(turndown.turndown(doc.body.innerHTML)).trim();
   return { text: converted, changed: converted !== text, warnings };
 }
+

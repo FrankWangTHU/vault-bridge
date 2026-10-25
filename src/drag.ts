@@ -1,3 +1,4 @@
+import { LocalizedError } from './i18n';
 import { createHash } from 'node:crypto';
 import { safeRelative } from './copy';
 export const DRAG_MIME = 'application/x-vault-bridge+json';
@@ -16,12 +17,12 @@ export function isCrossVaultDrag(types: readonly string[], ownRoot: string): boo
   return types.includes(DRAG_MIME) && !types.includes(sourceType(ownRoot));
 }
 export function parseDragPayload(raw: string): DragPayload {
-  if (!raw || raw.length > 8_000_000) throw new Error('拖拽数据为空或过大，请使用右键复制。');
+  if (!raw || raw.length > 8_000_000) throw new LocalizedError("拖拽数据为空或过大，请使用右键复制。");
   const data = JSON.parse(raw);
   if (data?.version !== 1 || typeof data.sourceRoot !== 'string' || typeof data.configDir !== 'string'
     || !Array.isArray(data.selections) || !data.selections.length || data.selections.length > 10000
-    || !data.resolved || typeof data.resolved !== 'object' || Array.isArray(data.resolved)) throw new Error('无法识别拖拽数据，请确认两边启用了新版 NoteParcel。');
-  data.selections.forEach((p: unknown) => { if (typeof p !== 'string') throw new Error('文件路径无效'); safeRelative(p); });
+    || !data.resolved || typeof data.resolved !== 'object' || Array.isArray(data.resolved)) throw new LocalizedError("无法识别拖拽数据，请确认两边启用了新版 NoteParcel。");
+  data.selections.forEach((p: unknown) => { if (typeof p !== 'string') throw new LocalizedError("文件路径无效"); safeRelative(p); });
   return data as DragPayload;
 }
 export function resolveDraggedLink(data: DragPayload, link: string, source: string): string | null {
@@ -48,3 +49,4 @@ export function dropFolder(target: EventTarget | null): string | null {
   const folder = element.closest('.nav-folder')?.querySelector<HTMLElement>(':scope > .nav-folder-title[data-path]');
   return folder && folder.dataset.path !== '/' ? folder.dataset.path ?? '' : '';
 }
+

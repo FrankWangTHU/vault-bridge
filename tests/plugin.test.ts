@@ -11,6 +11,7 @@ beforeEach(async () => {
   const app = { workspace: { on: (event: string, callback: (...args: any[]) => void) => handlers.set(event, callback), iterateAllLeaves: () => {}, getActiveFile: () => ({ path: '中文 name.md' }) }, vault: { adapter: new FileSystemAdapter(path.resolve('vault')), configDir: '.obsidian', getMarkdownFiles: () => [] } };
   plugin = new NoteParcel(app as any, {} as any);
   await plugin.onload();
+  await plugin.setLanguage('zh-CN');
 });
 function paste(text: string, { position = 0, document = '', files = 0, handled = false } = {}) {
   const event = { defaultPrevented: handled, clipboardData: { files: { length: files }, getData: (type: string) => type === 'text/plain' ? text : '' }, preventDefault: vi.fn() };
@@ -82,4 +83,21 @@ describe('plugin events', () => {
     expect(titles).toEqual(['复制本地绝对路径', '复制到其他 Vault…']);
     expect((plugin as any).commands.map((c: any) => c.id)).toEqual(['copy-current-local-path', 'copy-current-to-vault', 'convert-selection', 'repair-current-note']);
   });
+  it('switches menus and commands immediately without changing command IDs or preferences', async () => {
+    const ids = (plugin as any).commands.map((c: any) => c.id);
+    plugin.settings.lastTarget = '/研究';
+    const save = vi.spyOn(plugin, 'saveData');
+    await plugin.setLanguage('en');
+    const titles: string[] = [];
+    handlers.get('file-menu')!({ addItem: (callback: (item: any) => void) => {
+      const item = { setTitle: (title: string) => { titles.push(title); return item; }, setIcon: () => item, onClick: () => item }; callback(item);
+    } }, { path: '中文.md' });
+    expect(titles).toEqual(['Copy local absolute path', 'Copy to another vault…']);
+    expect((plugin as any).commands.map((c: any) => c.name)).toEqual(["Copy current file's local path", 'Copy current note to another vault', 'Repair selected math and tables', 'Repair math in current note']);
+    expect(save).toHaveBeenLastCalledWith(expect.objectContaining({ language: 'en', lastTarget: '/研究' }));
+    await plugin.setLanguage('zh-CN');
+    expect((plugin as any).commands.map((c: any) => c.id)).toEqual(ids);
+    expect((plugin as any).commands[0].name).toBe('复制当前文件本地路径');
+  });
 });
+

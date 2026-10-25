@@ -1,9 +1,11 @@
+import { createTranslator, LocalizedError, RollbackError, type Language } from './i18n';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { createHash } from 'node:crypto';
 import { extractLinks, isExternal, splitTarget, type NoteLink } from './markdown';
 
 export interface CopyRequest {
+  language?: Language;
   sourceRoot: string;
   targetRoot: string;
   selection: string | string[];
@@ -38,9 +40,9 @@ export function safeRelative(value: string, allowEmpty = false): string {
   if (allowEmpty && !normalized) return '';
   if (!normalized || normalized.startsWith('/') || normalized.split('/').some(p =>
     !p || p === '.' || p === '..' || /[<>:"|?*\x00-\x1f]/.test(p) || /[. ]$/.test(p) || /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(p))) {
-    throw new Error(`路径无效或越界：${value}`);
+    throw new LocalizedError("路径无效或越界：{0}", value);
   }
-  if (normalized.split('/').some(p => excluded.has(p.toLowerCase()))) throw new Error(`不能复制到或读取配置目录：${value}`);
+  if (normalized.split('/').some(p => excluded.has(p.toLowerCase()))) throw new LocalizedError("不能复制到或读取配置目录：{0}", value);
   return normalized;
 }
 async function statOrNull(file: string) {
@@ -50,10 +52,10 @@ async function checkPath(root: string, relative: string): Promise<void> {
   // Walk every component: following an intermediate symlink can escape the vault.
   let current = root;
   const rootStat = await fs.lstat(root);
-  if (rootStat.isSymbolicLink() || !rootStat.isDirectory()) throw new Error('Vault 根目录必须是普通目录，不能是符号链接。');
+  if (rootStat.isSymbolicLink() || !rootStat.isDirectory()) throw new LocalizedError("Vault 根目录必须是普通目录，不能是符号链接。");
   let ancestor = path.dirname(path.resolve(root));
   while (true) {
-    if ((await fs.lstat(ancestor)).isSymbolicLink()) throw new Error('Vault 路径包含符号链接，请使用真实路径。');
+    if ((await fs.lstat(ancestor)).isSymbolicLink()) throw new LocalizedError("Vault 路径包含符号链接，请使用真实路径。");
     const parent = path.dirname(ancestor);
     if (parent === ancestor) break;
     ancestor = parent;
@@ -63,8 +65,8 @@ async function checkPath(root: string, relative: string): Promise<void> {
     current = path.join(current, pieces[i]);
     const stat = await statOrNull(current);
     if (!stat) break;
-    if (stat.isSymbolicLink()) throw new Error(`不能使用符号链接：${current}`);
-    if (i < pieces.length - 1 && !stat.isDirectory()) throw new Error(`父路径不是文件夹：${current}`);
+    if (stat.isSymbolicLink()) throw new LocalizedError("不能使用符号链接：{0}", current);
+    if (i < pieces.length - 1 && !stat.isDirectory()) throw new LocalizedError("父路径不是文件夹：{0}", current);
   }
 }
 function isWithin(parent: string, child: string): boolean {
@@ -81,43 +83,44 @@ async function existingCaseInsensitive(root: string, relative: string): Promise<
     const match = (await fs.readdir(current)).find(name => key(name) === key(piece));
     if (!match) return false;
     // Don't silently merge differently-cased directory names on Unix.
-    if (match !== piece && index < pieces.length - 1) throw new Error(`目标目录大小写冲突：${relative}`);
+    if (match !== piece && index < pieces.length - 1) throw new LocalizedError("目标目录大小写冲突：{0}", relative);
     current = path.join(current, match);
   }
   return true;
 }
 
 export async function planCopy(request: CopyRequest): Promise<CopyPlan> {
-  if (!path.isAbsolute(request.sourceRoot) || !path.isAbsolute(request.targetRoot)) throw new Error('请填写 Vault 的绝对路径。');
+  const t = createTranslator(request.language ?? 'zh-CN');
+  if (!path.isAbsolute(request.sourceRoot) || !path.isAbsolute(request.targetRoot)) throw new LocalizedError("请填写 Vault 的绝对路径。");
   let sourceRoot = path.resolve(request.sourceRoot), targetRoot = path.resolve(request.targetRoot);
   const selections = [...new Set((Array.isArray(request.selection) ? request.selection : [request.selection]).map(p => safeRelative(p)))];
-  if (!selections.length) throw new Error('请先选择文件或文件夹。');
+  if (!selections.length) throw new LocalizedError("请先选择文件或文件夹。");
   const roots = selections.filter(p => !selections.some(other => p !== other && p.startsWith(`${other}/`)));
   const destination = safeRelative(request.destination.trim(), true);
   const configDir = request.configDir ?? '.obsidian';
   const isConfig = (relative: string) => relative === configDir || relative.startsWith(`${configDir}/`) || relative.split('/').some(p => excluded.has(p.toLowerCase()));
-  if (roots.some(isConfig)) throw new Error('不能复制 Vault 配置目录。');
+  if (roots.some(isConfig)) throw new LocalizedError("不能复制 Vault 配置目录。");
   for (const selection of roots) await checkPath(sourceRoot, selection);
   await checkPath(targetRoot, destination);
   // Windows short (8.3) names are legitimate aliases, not symbolic links.
   // Canonicalize only after checking actual link types, then compare vault roots.
   sourceRoot = await fs.realpath(sourceRoot);
   targetRoot = await fs.realpath(targetRoot);
-  if (isWithin(sourceRoot, targetRoot) || isWithin(targetRoot, sourceRoot)) throw new Error('目标必须是独立的其他 Vault，不能与源 Vault 相同或相互嵌套。');
+  if (isWithin(sourceRoot, targetRoot) || isWithin(targetRoot, sourceRoot)) throw new LocalizedError("目标必须是独立的其他 Vault，不能与源 Vault 相同或相互嵌套。");
   const marker = await statOrNull(path.join(targetRoot, '.obsidian'));
-  if (!marker?.isDirectory() || marker.isSymbolicLink()) throw new Error('目标目录不是可识别的 Vault：需包含普通 .obsidian 文件夹。');
+  if (!marker?.isDirectory() || marker.isSymbolicLink()) throw new LocalizedError("目标目录不是可识别的 Vault：需包含普通 .obsidian 文件夹。");
   const files: string[] = [], folders: string[] = [], warnings: string[] = [];
   const baseByRoot = new Map<string, string>();
   async function collect(relative: string) {
-    if (isConfig(relative)) { warnings.push(`已跳过配置目录：${relative}`); return; }
+    if (isConfig(relative)) { warnings.push(t("已跳过配置目录：{0}", relative)); return; }
     safeRelative(relative);
     const stat = await fs.lstat(path.join(sourceRoot, relative));
-    if (stat.isSymbolicLink()) { warnings.push(`已跳过符号链接：${relative}`); return; }
+    if (stat.isSymbolicLink()) { warnings.push(t("已跳过符号链接：{0}", relative)); return; }
     if (stat.isDirectory()) {
       folders.push(relative);
       for (const name of (await fs.readdir(path.join(sourceRoot, relative))).sort()) await collect(`${relative}/${name}`);
     } else if (stat.isFile()) files.push(relative);
-    else warnings.push(`已跳过特殊文件：${relative}`);
+    else warnings.push(t("已跳过特殊文件：{0}", relative));
   }
   for (const selection of roots) {
     baseByRoot.set(selection, (await fs.lstat(path.join(sourceRoot, selection))).isDirectory() ? path.posix.dirname(selection) : '');
@@ -133,20 +136,20 @@ export async function planCopy(request: CopyRequest): Promise<CopyPlan> {
       const { path: linkpath } = splitTarget(ref.target);
       if (!linkpath) continue;
       const resolved = request.resolve(linkpath, file);
-      if (!resolved) { warnings.push(`${file}：找不到链接 ${ref.target}`); links.push({ ref, resolved: null }); continue; }
-      if (isConfig(resolved)) { warnings.push(`${file}：已跳过配置文件 ${resolved}`); continue; }
+      if (!resolved) { warnings.push(t("{0}：找不到链接 {1}", file, ref.target)); links.push({ ref, resolved: null }); continue; }
+      if (isConfig(resolved)) { warnings.push(t("{0}：已跳过配置文件 {1}", file, resolved)); continue; }
       try {
         safeRelative(resolved);
         await checkPath(sourceRoot, resolved);
         const stat = await fs.lstat(path.join(sourceRoot, resolved));
-        if (!stat.isFile()) throw new Error('不是普通文件');
-      } catch { warnings.push(`${file}：无法复制附件或链接目标 ${resolved}`); continue; }
+        if (!stat.isFile()) throw new LocalizedError("不是普通文件");
+      } catch { warnings.push(t("{0}：无法复制附件或链接目标 {1}", file, resolved)); continue; }
       if (!resolved.toLowerCase().endsWith('.md')) allFiles.add(resolved);
-      else if (!selected.has(resolved)) warnings.push(`${file}：关联笔记未复制 ${resolved}（原链接保留，目标库可能存在同名笔记）`);
+      else if (!selected.has(resolved)) warnings.push(t("{0}：关联笔记未复制 {1}（原链接保留，目标库可能存在同名笔记）", file, resolved));
       links.push({ ref, resolved });
     }
-    if (/^---\r?\n/.test(text)) warnings.push(`${file}：属性区链接不参与附件收集，请核对需要的附件。`);
-    if (/<(?:img|a)\s/i.test(text)) warnings.push(`${file}：HTML 标签中的附件链接不参与复制。`);
+    if (/^---\r?\n/.test(text)) warnings.push(t("{0}：属性区链接不参与附件收集，请核对需要的附件。", file));
+    if (/<(?:img|a)\s/i.test(text)) warnings.push(t("{0}：HTML 标签中的附件链接不参与复制。", file));
     documents.set(file, { text, links });
   }
   const mapping = new Map<string, string>(), reserved = new Set<string>(), renamed: CopyPlan['renamed'] = [];
@@ -180,7 +183,7 @@ export async function planCopy(request: CopyRequest): Promise<CopyPlan> {
   for (const directory of directories) {
     await checkPath(targetRoot, directory);
     const stat = await statOrNull(path.join(targetRoot, directory));
-    if (stat && !stat.isDirectory()) throw new Error(`目标位置有同名文件，不能作为文件夹：${directory}`);
+    if (stat && !stat.isDirectory()) throw new LocalizedError("目标位置有同名文件，不能作为文件夹：{0}", directory);
     await existingCaseInsensitive(targetRoot, directory);
   }
   const entries: CopyEntry[] = [];
@@ -212,7 +215,7 @@ export async function planCopy(request: CopyRequest): Promise<CopyPlan> {
     }
     entries.push(entry);
   }
-  for (const file of files) if (/\.(canvas|excalidraw)$/i.test(file)) warnings.push(`${file}：作为普通文件复制，不解析内部依赖。`);
+  for (const file of files) if (/\.(canvas|excalidraw)$/i.test(file)) warnings.push(t("{0}：作为普通文件复制，不解析内部依赖。", file));
   return { sourceRoot, targetRoot, entries, directories: [...directories], warnings: [...new Set(warnings)], renamed, notes: documents.size, attachments: entries.length - documents.size };
 }
 
@@ -238,10 +241,10 @@ export async function executeCopy(plan: CopyPlan, progress?: (done: number, tota
       await checkPath(plan.targetRoot, entry.destination);
       const source = path.join(plan.sourceRoot, entry.source), target = path.join(plan.targetRoot, entry.destination);
       const stat = await fs.stat(source);
-      if (stat.size !== entry.size || stat.mtimeMs !== entry.mtime) throw new Error(`源文件已变化，请重新预览：${entry.source}`);
+      if (stat.size !== entry.size || stat.mtimeMs !== entry.mtime) throw new LocalizedError("源文件已变化，请重新预览：{0}", entry.source);
       const bytes = await fs.readFile(source);
-      if (entry.digest && hash(bytes.toString('utf8')) !== entry.digest) throw new Error(`笔记已变化，请重新预览：${entry.source}`);
-      if (await existingCaseInsensitive(plan.targetRoot, entry.destination)) throw new Error(`目标已出现同名文件，请重新预览：${entry.destination}`);
+      if (entry.digest && hash(bytes.toString('utf8')) !== entry.digest) throw new LocalizedError("笔记已变化，请重新预览：{0}", entry.source);
+      if (await existingCaseInsensitive(plan.targetRoot, entry.destination)) throw new LocalizedError("目标已出现同名文件，请重新预览：{0}", entry.destination);
       // Exclusive creation prevents overwriting a file created after the preview.
       const handle = await fs.open(target, 'wx');
       try {
@@ -264,6 +267,7 @@ export async function executeCopy(plan: CopyPlan, progress?: (done: number, tota
       try { await checkPath(plan.targetRoot, path.relative(plan.targetRoot, dir)); await fs.rmdir(dir); }
       catch { /* Never recursively remove a directory: other files may have appeared. */ }
     }
-    throw new Error(`${error instanceof Error ? error.message : String(error)}${cleanupErrors.length ? `；部分新文件未能清理，请检查：${cleanupErrors.join('、')}` : '；本次已写入文件已回滚。'}`);
+    throw new RollbackError(error, cleanupErrors);
   }
 }
+
