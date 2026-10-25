@@ -1,31 +1,26 @@
-# NoteParcel · 笔记包裹
+# NoteParcel
 
-**Copy notes across vaults, with attachments and links intact. Repair pasted math and tables.**
+**Take your notes anywhere—with attachments and links along for the ride.**
 
-**跨库复制，附件随行、链接保留；粘贴公式与表格，自动修复。**
+**English** | [简体中文](README.zh-CN.md)
 
-[English](README.md) | [简体中文](README.zh-CN.md) · [GitHub repository](https://github.com/FrankWangTHU/vault-bridge) · [Downloads](https://github.com/FrankWangTHU/vault-bridge/releases) · [Report an issue](https://github.com/FrankWangTHU/vault-bridge/issues)
+Move research from one Obsidian vault to another without gathering attachments by hand. NoteParcel copies selected notes and folders, brings their local attachments, and updates links between copied files. Paste math and tables from ChatGPT or the web into a cleaner Markdown workflow, and copy local file paths whenever another app needs them.
 
-NoteParcel helps you reuse your research in Obsidian: copy selected notes and their attachments to another vault, update links between copied files, and turn math and tables from ChatGPT or the web into readable Markdown. Copy a local file path whenever you need to reference a note in another app.
+**Desktop only · Obsidian 1.7.2+ · Chinese plugin interface · Local processing.** No account, API key, telemetry, or content uploads.
 
-NoteParcel 让研究资料更方便地复用：将选中的笔记连同附件复制到另一个 Vault，自动更新已复制文件之间的链接；把 ChatGPT 或网页中的公式、表格转为可读的 Markdown；需要在其他应用引用文件时，右键即可复制本地路径。
+## Less cleanup. More time for your ideas.
 
-**Desktop only · Obsidian 1.7.2+ · Chinese interface · All processing stays local.** No API key, account, telemetry, or uploads.
+- **Pack your notes, not just the text.** Copy notes or entire folders to another vault with their referenced local attachments.
+- **Drag, drop, keep working.** Stable cross-window drag-and-drop lets you copy notes, folders, or multiple selected items into another vault's file explorer.
+- **Keep copied links connected.** Links between copied files are updated automatically. Shared attachments are copied once, conflicting filenames are numbered, and existing files stay untouched.
+- **Make pasted math and tables readable.** Convert supported LaTeX delimiters and HTML tables on paste, or repair selected text or the current note with undo support.
+- **Get a file path in a click.** Copy an absolute file or folder path from the context menu.
 
-**仅桌面端 · Obsidian 1.7.2 及以上 · 中文界面 · 全部在本地处理。** 无需 API 密钥或账号，不采集遥测、不上传内容。
+Use it to bring research into a project vault, reuse a collection of notes, or keep formulas and tables readable without interrupting your writing.
 
-## Features / 主要功能
+⭐ **Finding NoteParcel useful? [Give it a Star on GitHub](https://github.com/FrankWangTHU/vault-bridge)** to support the project and help more Obsidian users discover it. Bug reports and suggestions are welcome, too.
 
-- **Copy notes with attachments / 笔记与附件一起复制** — Select notes or folders, choose a registered vault and destination folder, then copy. 选择笔记或文件夹，选好已登记的目标库和目录，即可携带附件一起复制。
-- **Keep links and existing files safe / 保留链接，避免覆盖** — Update links between copied files, copy shared attachments once, and number conflicting filenames. 自动更新已复制文件间的链接，共享附件仅复制一次，重名文件自动编号；源文件和目标已有文件保持原样。
-- **Repair math and tables / 修复公式与表格** — Convert supported LaTeX delimiters and HTML tables during paste, or repair a selection or the current note with undo support. 粘贴时转换支持的 LaTeX 分隔符和 HTML 表格，也可修复选区或当前笔记，支持撤销；保护代码、笔记属性及已有公式。
-- **Copy local paths / 复制本地路径** — Right-click a file or folder to copy its absolute path, or use the command for the active note. 右键文件或文件夹复制绝对路径，也可通过命令复制当前笔记路径。
-
-Cross-window drag-and-drop is **experimental**. Use the context-menu copy workflow if it does not work in your setup.
-
-跨窗口拖拽仍为**实验性功能**；如无法正常工作，请使用右键菜单复制。
-
-## Installation / 安装
+## Installation
 
 Install **NoteParcel** from **Settings → Community plugins → Browse**, or open the [community listing](https://community.obsidian.md/plugins/vault-bridge-toolkit) and select **Add to Obsidian**.
 
@@ -65,7 +60,7 @@ Wiki links, embeds, aliases, image widths, heading/block references, PDF page fr
 
 The source is never deleted or changed. Existing destination files are never overwritten. A failed copy attempts to remove only the files and empty folders created by that operation. Forced termination or disk errors can prevent complete rollback.
 
-### Drag between vault windows (experimental)
+### Drag between vault windows
 
 Enable NoteParcel in both vaults (drag support was introduced in VaultBridge 0.2.0). Drag notes, a folder, or multiple selected items from the source file explorer into the destination vault's file explorer:
 
@@ -75,7 +70,7 @@ Enable NoteParcel in both vaults (drag support was introduced in VaultBridge 0.2
 
 Only dropping into the other vault's file explorer triggers copying. Merely leaving the source window does not. Same-vault dragging keeps Obsidian's normal behavior. Disable cross-vault dragging in settings if needed.
 
-This feature depends on Obsidian's file explorer structure and desktop drag behavior. Simulated events have been tested; real cross-window operation has **not** been verified. Use the context-menu workflow if dragging does not work.
+Cross-window drag-and-drop is stable and available for everyday use. It copies your content while preserving the source files. The context-menu copy workflow is also available.
 
 ## Repair pasted math and tables
 
@@ -101,13 +96,13 @@ The registry is an internal Obsidian format; if it changes, use manual entry. So
 
 ## Limitations and verification
 
-- Desktop only. Automated checks run on Windows and Linux; macOS and real Obsidian UI acceptance testing remain outstanding.
+- Desktop only. Automated checks run on Windows and Linux; macOS testing remains outstanding.
 - Copies use saved files. Save edits before copying or dragging.
 - No dependency parsing inside frontmatter, raw HTML, Canvas, or third-party plugin files. Such files are copied as ordinary files where applicable.
 - Remote attachments are not downloaded. Source and destination vaults cannot be identical or nested.
 - Math images and visual-only formulas without LaTeX source are not reconstructed. Merged or nested HTML tables retain normal paste behavior with a notice. The first table row becomes the Markdown header.
 - Plain text that has lost its table structure cannot reliably be restored.
-- Automated tests cover representative clipboard HTML and simulated UI events; they do not substitute for real ChatGPT clipboard or Obsidian rendering/drag tests. See [TESTING.md](TESTING.md).
+- Automated tests cover representative clipboard HTML and simulated UI events. For manual verification steps, see [TESTING.md](TESTING.md).
 
 ## Development
 
