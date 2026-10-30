@@ -30,7 +30,7 @@
 
 如需从 GitHub 手动安装：
 
-1. 从 [Releases](https://github.com/FrankWangTHU/vault-bridge/releases) 下载 `vault-bridge-toolkit-0.2.5.zip`，不要下载 GitHub 自动生成的 Source code 压缩包。
+1. 从 [Releases](https://github.com/FrankWangTHU/vault-bridge/releases) 下载 `vault-bridge-toolkit-0.2.6.zip`，不要下载 GitHub 自动生成的 Source code 压缩包。
 2. 将压缩包里的 `vault-bridge-toolkit` 文件夹放入你的 Vault 的 `.obsidian/plugins/` 目录。
 3. 确认 `.obsidian/plugins/vault-bridge-toolkit/` 下直接包含 `main.js`、`manifest.json`、`styles.css`。
 4. 重启 Obsidian，在“设置 → 第三方插件”中允许使用第三方插件并启用 **NoteParcel**。

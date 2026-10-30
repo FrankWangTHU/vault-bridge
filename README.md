@@ -32,7 +32,7 @@ Install **NoteParcel** from **Settings → Community plugins → Browse**, or op
 
 For manual installation from GitHub / 从 GitHub 手动安装：
 
-1. Download `vault-bridge-toolkit-0.2.5.zip` from [Releases](https://github.com/FrankWangTHU/vault-bridge/releases). Do not use the automatically generated Source code archive.
+1. Download `vault-bridge-toolkit-0.2.6.zip` from [Releases](https://github.com/FrankWangTHU/vault-bridge/releases). Do not use the automatically generated Source code archive.
 2. Extract the `vault-bridge-toolkit` folder into your vault's `.obsidian/plugins/` directory.
 3. Verify that `main.js`, `manifest.json`, and `styles.css` are directly inside `.obsidian/plugins/vault-bridge-toolkit/`.
 4. Restart Obsidian and enable NoteParcel in **Settings → Community plugins**.

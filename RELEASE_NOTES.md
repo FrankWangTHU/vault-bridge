@@ -1,29 +1,29 @@
-# NoteParcel 0.2.5
+# NoteParcel 0.2.6
 
 ## English
 
-NoteParcel now speaks English and Simplified Chinese throughout the plugin.
+Copy referenced Excalidraw drawings across vaults and keep external attachments organized by note name. Resolves [#1](https://github.com/FrankWangTHU/vault-bridge/issues/1).
 
-- Choose **Follow Obsidian**, **简体中文**, or **English** in **Settings → NoteParcel → Interface language**.
-- Translated context menus, command names, settings, copy and folder dialogs, reports, progress, and plugin warnings/errors.
-- Switching updates settings and commands immediately; newly opened menus and dialogs use the selected language. Preferences persist across restarts.
-- Existing command IDs, hotkeys, vault preferences, filenames, and paths are preserved.
-- Cross-window drag-and-drop is stable. Updated English and Chinese guides explain the workflow.
+- External attachments now default to `assets/<final note name>/` beside each copied note, including upgrades without an attachment-location preference. Shared attachments get a separate copy for each note in this mode.
+- Choose **Settings → NoteParcel → Attachment location → Shared attachment folder** to use the previous `_attachments/vault-bridge/` layout. Attachments inside a selected folder keep their existing structure in either mode.
+- Referenced `.excalidraw.md` drawings, nested drawings and their local Markdown/wiki attachment links are now collected and rewritten. Frame/block selectors and embed widths such as `#^frame=…|100%` are preserved. Drawing scene data stays intact.
+- Context-menu copies and cross-vault drag-and-drop both support the attachment setting. English and Simplified Chinese settings and guides are updated.
+- Path checks reject blocked or symbolic-link attachment directories before filename conflict handling.
 
-Download `vault-bridge-toolkit-0.2.5.zip`, replace the files in `.obsidian/plugins/vault-bridge-toolkit/`, keep `data.json`, and reload the plugin. Community users can update when the directory has processed this release.
+Verified with 66 automated tests, Windows/Linux checks, and installation packaging. Legacy `.excalidraw` JSON is copied intact; its internal dependencies are not parsed. Source files and existing destination files are preserved.
 
-⭐ If NoteParcel helps your workflow, please give [the project a Star](https://github.com/FrankWangTHU/vault-bridge).
+Update through Obsidian's community plugins when the directory has processed this release, or install `vault-bridge-toolkit-0.2.6.zip` from this release. Keep your existing `data.json` and reload the plugin. Cross-vault drag-and-drop users should update both vaults.
 
 ## 简体中文
 
-NoteParcel 现在支持完整的中英文界面切换。
+修复跨库复制中的 Excalidraw 引用，并默认按笔记名整理外部附件，解决 [#1](https://github.com/FrankWangTHU/vault-bridge/issues/1)。
 
-- 在“设置 → NoteParcel → 界面语言”选择“跟随 Obsidian / 简体中文 / English”。
-- 覆盖右键菜单、命令名称、设置、复制与文件夹选择窗口、报告、进度和插件错误提示。
-- 切换后设置和命令立即更新，新打开的菜单与窗口使用所选语言；重启后保留选择。
-- 保留原有命令标识、快捷键、目标库偏好、文件名与路径。
-- 跨窗口拖拽已稳定可用，中英文指南同步更新。
+- 外部附件默认放到复制后笔记旁的 `assets/<最终笔记名>/`，升级时尚未设置此选项也使用该默认值。多篇笔记共用的附件会为每篇笔记各保留一份副本。
+- 可在“设置 → NoteParcel → 附件存放方式 → 共享附件目录”切回原来的 `_attachments/vault-bridge/` 布局。所选文件夹内的附件在两种模式下均保留原有目录结构。
+- 自动携带引用的 `.excalidraw.md` 绘图、嵌套绘图及其 Markdown/双链本地附件，并更新链接；保留 `#^frame=…|100%` 等帧/块定位和显示尺寸，保持绘图场景数据完整。
+- 右键复制与跨库拖入均支持该选项，中英文设置和指南同步更新。
+- 附件目录被文件或符号链接占用时，及时报告问题，避免反复尝试重名编号。
 
-下载 `vault-bridge-toolkit-0.2.5.zip`，覆盖 `.obsidian/plugins/vault-bridge-toolkit/` 中的插件文件，保留 `data.json` 并重载插件。社区安装用户可在目录处理此版本后更新。
+已通过 66 项自动测试、Windows/Linux 检查和安装包验证。旧式 `.excalidraw` JSON 保持原样复制，内部依赖暂不解析。源文件与目标已有文件保持原样。
 
-⭐ 如果 NoteParcel 帮到了你，欢迎[为项目点一颗 Star](https://github.com/FrankWangTHU/vault-bridge)。
+社区目录处理此版本后可在 Obsidian 中检查更新，也可下载安装本页的 `vault-bridge-toolkit-0.2.6.zip`。保留原有 `data.json` 并重载插件。跨库拖拽建议两个库都更新。
