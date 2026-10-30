@@ -1,5 +1,9 @@
 // English translations keyed by the original Simplified Chinese messages.
 const english = {
+  "附件存放方式": "Attachment location",
+  "默认将外部附件放到复制后笔记旁的 assets/笔记名/，也可选择共享目录。所选文件夹内的附件保留原位置。": "By default, external attachments go in assets/note-name/ beside each copied note. You can choose a shared folder instead. Attachments inside a selected folder keep their existing locations.",
+  "共享附件目录": "Shared attachment folder",
+  "按笔记名分类": "Organize by note name",
   "复制本地绝对路径": "Copy local absolute path",
   "复制到其他 Vault…": "Copy to another vault…",
   "复制当前文件本地路径": "Copy current file's local path",

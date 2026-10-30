@@ -11,7 +11,8 @@ async function put(root: string, file: string, text = 'bytes') {
   await fs.writeFile(path.join(root, file), text);
 }
 function request(selection: string, overrides: Partial<CopyRequest> = {}): CopyRequest {
-  return { sourceRoot: source, targetRoot: target, selection, destination: '导入', resolve: link => link, ...overrides };
+  // Retain coverage for the optional legacy shared-folder layout.
+  return { sourceRoot: source, targetRoot: target, selection, destination: '导入', attachmentFolderMode: 'shared', resolve: link => link, ...overrides };
 }
 beforeEach(async () => {
   temp = await fs.mkdtemp(path.join(os.tmpdir(), 'vault-bridge-test-'));

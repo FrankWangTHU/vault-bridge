@@ -4,6 +4,7 @@ import NoteParcel from '../src/main';
 import { FileSystemAdapter } from './mocks/obsidian';
 import * as path from 'node:path';
 import { DRAG_MIME, parseDragPayload, sourceType } from '../src/drag';
+import * as vaults from '../src/vaults';
 
 let plugin: NoteParcel, handlers: Map<string, (...args: any[]) => void>;
 beforeEach(async () => {
@@ -20,6 +21,33 @@ function paste(text: string, { position = 0, document = '', files = 0, handled =
   return { event, editor };
 }
 describe('plugin events', () => {
+  it('defaults to per-note attachment folders for missing or invalid saved preferences', async () => {
+    expect(plugin.settings.attachmentFolderMode).toBe('note');
+    for (const saved of [{ autoConvert: false }, { attachmentFolderMode: 'invalid' }]) {
+      const restored = new NoteParcel(plugin.app, {} as any);
+      vi.spyOn(restored, 'loadData').mockResolvedValue(saved);
+      await restored.onload();
+      expect(restored.settings.attachmentFolderMode).toBe('note');
+    }
+  });
+  it('passes the chosen attachment layout to context-menu copy requests', () => {
+    plugin.settings.attachmentFolderMode = 'note';
+    const request = plugin.request(['项目.md'], { name: 'Research', path: path.resolve('Research'), destination: '' }, 'Imported');
+    expect(request.attachmentFolderMode).toBe('note');
+    expect(request.selection).toEqual(['项目.md']);
+    expect(request.destination).toBe('Imported');
+  });
+  it('uses the receiving vault attachment preference for drag-and-drop copies', async () => {
+    const other = path.resolve('other-vault');
+    const canonical = vi.spyOn(vaults, 'canonicalPath').mockResolvedValue(other);
+    const targets = vi.spyOn(plugin, 'targets').mockResolvedValue({ vaults: [{ name: 'Other', path: other, destination: '' }] });
+    const transfer = vi.spyOn(plugin, 'transfer').mockResolvedValue({ sourceRoot: other, targetRoot: plugin.sourceRoot, entries: [], directories: [], notes: 0, attachments: 0, warnings: [], renamed: [] });
+    try {
+      plugin.settings.attachmentFolderMode = 'note';
+      await plugin.receiveDrag(JSON.stringify({ version: 1, sourceRoot: other, configDir: '.obsidian', selections: ['项目.md'], resolved: {} }), 'Imported');
+      expect(transfer).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ attachmentFolderMode: 'note', sourceRoot: other, destination: 'Imported' }));
+    } finally { canonical.mockRestore(); targets.mockRestore(); transfer.mockRestore(); }
+  });
   it('repairs the current note with one undoable edit and preserves code', () => {
     const text = '[ \\boxed{P(D)} ]\n\n- (P(\\theta))\n\n`(P(D))`';
     const editor = { getValue: () => text, offsetToPos: vi.fn(() => ({ line: 4, ch: 8 })), replaceRange: vi.fn() };
@@ -53,6 +81,30 @@ describe('plugin events', () => {
     plugin.settings.crossVaultDrag = false;
     events.get('drop')(event);
     expect(receive).not.toHaveBeenCalled(); expect(event.preventDefault).not.toHaveBeenCalled();
+  });
+  it('collects linked Excalidraw dependencies in drag data without following ordinary notes', () => {
+    document.body.innerHTML = '<div class="nav-files-container"><div class="nav-file-title" data-path="A.md"></div></div>';
+    const app = plugin.app as any;
+    const drawing = { path: 'assets/Plan.excalidraw.md' };
+    app.vault.getMarkdownFiles = () => [{ path: 'A.md' }, drawing, { path: 'Ordinary.md' }];
+    app.metadataCache = {
+      getFileCache: (file: { path: string }) => file.path === 'A.md'
+        ? { embeds: [{ link: 'assets/Plan.excalidraw#^frame=abc' }], links: [{ link: 'Ordinary' }] }
+        : { embeds: [{ link: 'image.png' }, { link: 'assets/Plan.excalidraw' }] },
+      getFirstLinkpathDest: vi.fn((link: string) => link === 'assets/Plan.excalidraw.md' ? drawing
+        : link === 'Ordinary' ? { path: 'Ordinary.md' } : link === 'image.png' ? { path: 'assets/image.png' } : null),
+    };
+    const data = new Map<string, string>();
+    (plugin as any).domEvents.get('dragstart')({ target: document.querySelector('.nav-file-title'), dataTransfer: {
+      setData: (key: string, value: string) => data.set(key, value), effectAllowed: '',
+    } });
+    const payload = parseDragPayload(data.get(DRAG_MIME)!);
+    expect(payload.resolved['A.md']['assets/Plan.excalidraw']).toBe(drawing.path);
+    expect(payload.resolved[drawing.path]['image.png']).toBe('assets/image.png');
+    expect(payload.resolved).not.toHaveProperty('Ordinary.md');
+    expect(Object.keys(payload.resolved)).toHaveLength(2);
+    const request = plugin.request(['A.md'], { name: 'Other', path: '/other', destination: '' }, '');
+    expect(request.resolve('assets/Plan.excalidraw', 'A.md')).toBe(drawing.path);
   });
   it('uses exactly one editor change for a converted paste', () => {
     const { event, editor } = paste('Text \\(x\\)');

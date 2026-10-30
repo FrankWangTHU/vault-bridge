@@ -12,7 +12,7 @@ Move research from one Obsidian vault to another without gathering attachments b
 
 - **Pack your notes, not just the text.** Copy notes or entire folders to another vault with their referenced local attachments.
 - **Drag, drop, keep working.** Stable cross-window drag-and-drop lets you copy notes, folders, or multiple selected items into another vault's file explorer.
-- **Keep copied links connected.** Links between copied files are updated automatically. Shared attachments are copied once, conflicting filenames are numbered, and existing files stay untouched.
+- **Keep copied links connected.** Links between copied files are updated automatically. Choose a shared attachment folder or organize attachments by note name; conflicting filenames are numbered and existing files stay untouched.
 - **Make pasted math and tables readable.** Convert supported LaTeX delimiters and HTML tables on paste, or repair selected text or the current note with undo support.
 - **Get a file path in a click.** Copy an absolute file or folder path from the context menu.
 
@@ -58,9 +58,14 @@ If a vault is missing, open it once with Obsidian or expand the manual-add secti
 
 ### Attachment and link rules
 
-Copying a folder preserves its name, hierarchy, internal attachments, and empty folders. Local attachments referenced outside the selected content are collected into `_attachments/vault-bridge/` under the destination folder. Shared attachments are copied once. Conflicts become `name (1).ext`, `name (2).ext`, and so on.
+Copying a folder preserves its name, hierarchy, internal attachments, and empty folders. Choose **Settings → NoteParcel → Attachment location** for attachments referenced outside the selected content:
 
-Wiki links, embeds, aliases, image widths, heading/block references, PDF page fragments, and ordinary/reference-style Markdown links are supported. Copied wiki links use full paths within the destination vault; Markdown links use relative paths. Links to other notes are not followed recursively. Uncopied links are left intact and reported; they may resolve to a different same-named note in the target vault.
+- **Organize by note name** (default): place attachments in `assets/<noteFileName>/` beside the final copied note. For example, `Projects/Report.md` uses `Projects/assets/Report/`. Each note receives its own copy of a shared attachment. If the note is renamed to avoid a conflict, its attachment folder uses the final name.
+- **Shared attachment folder**: collect attachments into `_attachments/vault-bridge/` under the destination folder, copying each shared attachment once.
+
+Attachments already inside a selected folder retain their locations in both modes. Filename conflicts become `name (1).ext`, `name (2).ext`, and so on. This setting applies to context-menu copies and to files dropped into this vault from another vault.
+
+Wiki links, embeds, aliases, image widths, heading/block references, PDF page fragments, and ordinary/reference-style Markdown links are supported. Copied wiki links use full paths within the destination vault; Markdown links use relative paths. Linked Excalidraw drawings (`.excalidraw` and `.excalidraw.md`) are included automatically, preserving frame/block fragments such as `#^frame=...` and display sizes such as `|100%`. For Markdown drawings, local files referenced by Markdown/wiki links are also collected and those links are updated. Ordinary linked notes are not followed recursively. Uncopied links are left intact and reported; they may resolve to a different same-named note in the target vault.
 
 The source is never deleted or changed. Existing destination files are never overwritten. A failed copy attempts to remove only the files and empty folders created by that operation. Forced termination or disk errors can prevent complete rollback.
 
@@ -102,7 +107,7 @@ The registry is an internal Obsidian format; if it changes, use manual entry. So
 
 - Desktop only. Automated checks run on Windows and Linux; macOS testing remains outstanding.
 - Copies use saved files. Save edits before copying or dragging.
-- No dependency parsing inside frontmatter, raw HTML, Canvas, or third-party plugin files. Such files are copied as ordinary files where applicable.
+- No dependency parsing inside frontmatter, raw HTML, Canvas, or raw Excalidraw JSON. Markdown Excalidraw files support Markdown/wiki attachment references; other third-party formats are copied as ordinary files where applicable.
 - Remote attachments are not downloaded. Source and destination vaults cannot be identical or nested.
 - Math images and visual-only formulas without LaTeX source are not reconstructed. Merged or nested HTML tables retain normal paste behavior with a notice. The first table row becomes the Markdown header.
 - Plain text that has lost its table structure cannot reliably be restored.
