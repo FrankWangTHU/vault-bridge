@@ -6,6 +6,7 @@ import { extractLinks, isExternal, splitTarget, type NoteLink } from './markdown
 
 export interface CopyRequest {
   language?: Language;
+  attachmentFolderMode?: 'shared' | 'note';
   sourceRoot: string;
   targetRoot: string;
   selection: string | string[];
@@ -127,24 +128,39 @@ export async function planCopy(request: CopyRequest): Promise<CopyPlan> {
     await collect(selection);
   }
   const selected = new Set(files), allFiles = new Set(files);
+  const isDrawing = (file: string) => /\.excalidraw(?:\.md)?$/i.test(file);
+  const perNote = request.attachmentFolderMode !== 'shared';
   const documents = new Map<string, { text: string; links: { ref: NoteLink; resolved: string | null }[] }>();
-  for (const file of files.filter(p => p.toLowerCase().endsWith('.md'))) {
+  const pending = files.filter(p => p.toLowerCase().endsWith('.md'));
+  const queued = new Set(pending);
+  // Modern drawings are Markdown files, but are dependencies rather than ordinary linked notes.
+  for (let index = 0; index < pending.length; index++) {
+    const file = pending[index];
     const text = await fs.readFile(path.join(sourceRoot, file), 'utf8');
     const links: { ref: NoteLink; resolved: string | null }[] = [];
     for (const ref of extractLinks(text)) {
       if (isExternal(ref.target)) continue;
       const { path: linkpath } = splitTarget(ref.target);
       if (!linkpath) continue;
-      const resolved = request.resolve(linkpath, file);
-      if (!resolved) { warnings.push(t("{0}：找不到链接 {1}", file, ref.target)); links.push({ ref, resolved: null }); continue; }
-      if (isConfig(resolved)) { warnings.push(t("{0}：已跳过配置文件 {1}", file, resolved)); continue; }
-      try {
-        safeRelative(resolved);
-        await checkPath(sourceRoot, resolved);
-        const stat = await fs.lstat(path.join(sourceRoot, resolved));
-        if (!stat.isFile()) throw new LocalizedError("不是普通文件");
-      } catch { warnings.push(t("{0}：无法复制附件或链接目标 {1}", file, resolved)); continue; }
-      if (!resolved.toLowerCase().endsWith('.md')) allFiles.add(resolved);
+      const candidates = [...new Set([
+        request.resolve(linkpath, file),
+        /\.excalidraw$/i.test(linkpath) ? request.resolve(`${linkpath}.md`, file) : null,
+      ].filter((value): value is string => !!value))];
+      if (!candidates.length) { warnings.push(t("{0}：找不到链接 {1}", file, ref.target)); links.push({ ref, resolved: null }); continue; }
+      let resolved: string | null = null;
+      for (const candidate of candidates) {
+        if (isConfig(candidate)) { warnings.push(t("{0}：已跳过配置文件 {1}", file, candidate)); continue; }
+        try {
+          safeRelative(candidate);
+          await checkPath(sourceRoot, candidate);
+          if ((await fs.lstat(path.join(sourceRoot, candidate))).isFile()) { resolved = candidate; break; }
+        } catch { /* Invalid, missing and symbolic-link targets are never read or copied. */ }
+      }
+      if (!resolved) { warnings.push(t("{0}：无法复制附件或链接目标 {1}", file, candidates[0])); continue; }
+      if (!resolved.toLowerCase().endsWith('.md') || isDrawing(resolved)) {
+        allFiles.add(resolved);
+        if (/\.excalidraw\.md$/i.test(resolved) && !queued.has(resolved)) { pending.push(resolved); queued.add(resolved); }
+      }
       else if (!selected.has(resolved)) warnings.push(t("{0}：关联笔记未复制 {1}（原链接保留，目标库可能存在同名笔记）", file, resolved));
       links.push({ ref, resolved });
     }
@@ -155,30 +171,64 @@ export async function planCopy(request: CopyRequest): Promise<CopyPlan> {
   const mapping = new Map<string, string>(), reserved = new Set<string>(), renamed: CopyPlan['renamed'] = [];
   const join = (...parts: string[]) => parts.filter(Boolean).join('/');
   const candidateFor = (source: string) => {
-    if (!selected.has(source) && !folders.includes(source)) return join(destination, '_attachments', 'vault-bridge', path.posix.basename(source));
     const owner = roots.find(root => source === root || source.startsWith(`${root}/`))!;
     const base = baseByRoot.get(owner)!;
     return join(destination, base ? path.posix.relative(base, source) : path.posix.basename(source));
   };
   // Check directory structure first so files cannot be mapped beneath a file or symlink.
   const directories = new Set(folders.map(candidateFor));
-  for (const source of allFiles) {
+  for (const source of files) {
     let parent = path.posix.dirname(candidateFor(source));
     while (parent !== '.') { directories.add(parent); parent = path.posix.dirname(parent); }
   }
   const directoryKeys = new Set([...directories].map(key));
-  for (const source of allFiles) {
-    const desired = safeRelative(candidateFor(source));
+  const copies: { source: string; destination: string; context: string }[] = [];
+  const addParents = (file: string) => {
+    let parent = path.posix.dirname(file);
+    while (parent !== '.') {
+      if (reserved.has(key(parent))) throw new LocalizedError("目标位置有同名文件，不能作为文件夹：{0}", parent);
+      directories.add(parent); directoryKeys.add(key(parent)); parent = path.posix.dirname(parent);
+    }
+  };
+  const allocate = async (source: string, desired: string, context: string) => {
+    desired = safeRelative(desired);
+    // Renaming a leaf can never fix a blocked/symlink parent; reject it before searching.
+    await checkPath(targetRoot, desired);
+    addParents(desired);
     let candidate = desired, counter = 1;
     const ext = path.posix.extname(desired), stem = desired.slice(0, desired.length - ext.length);
     while (reserved.has(key(candidate)) || directoryKeys.has(key(candidate)) || await existingCaseInsensitive(targetRoot, candidate)) {
       candidate = `${stem} (${counter++})${ext}`;
     }
     await checkPath(targetRoot, candidate);
-    reserved.add(key(candidate)); mapping.set(source, candidate);
+    reserved.add(key(candidate)); copies.push({ source, destination: candidate, context });
     if (desired !== candidate) renamed.push({ from: desired, to: candidate });
-    const parent = path.posix.dirname(candidate);
-    if (parent !== '.') directories.add(parent);
+    return candidate;
+  };
+  // Allocate notes first: their final (possibly renamed) names determine assets/<noteFileName>/.
+  for (const source of files) mapping.set(source, await allocate(source, candidateFor(source), perNote ? source : ''));
+  const attachmentsByNote = new Map<string, Map<string, string>>();
+  if (perNote) {
+    for (const owner of files.filter(file => documents.has(file))) {
+      const notePath = mapping.get(owner)!;
+      const stem = path.posix.basename(notePath, path.posix.extname(notePath));
+      const attachmentFolder = join(path.posix.dirname(notePath) === '.' ? '' : path.posix.dirname(notePath), 'assets', stem);
+      const attachments = new Map<string, string>(); attachmentsByNote.set(owner, attachments);
+      const visited = new Set<string>();
+      const visit = async (file: string): Promise<void> => {
+        if (visited.has(file)) return; visited.add(file);
+        for (const { resolved } of documents.get(file)?.links ?? []) {
+          if (!resolved || selected.has(resolved) || !allFiles.has(resolved)) continue;
+          if (!attachments.has(resolved)) attachments.set(resolved, await allocate(resolved, join(attachmentFolder, path.posix.basename(resolved)), owner));
+          if (documents.has(resolved)) await visit(resolved);
+        }
+      };
+      await visit(owner);
+    }
+  } else {
+    for (const source of allFiles) if (!selected.has(source)) {
+      mapping.set(source, await allocate(source, join(destination, '_attachments', 'vault-bridge', path.posix.basename(source)), ''));
+    }
   }
   for (const directory of directories) {
     await checkPath(targetRoot, directory);
@@ -187,7 +237,7 @@ export async function planCopy(request: CopyRequest): Promise<CopyPlan> {
     await existingCaseInsensitive(targetRoot, directory);
   }
   const entries: CopyEntry[] = [];
-  for (const [source, dest] of mapping) {
+  for (const { source, destination: dest, context } of copies) {
     const stat = await fs.stat(path.join(sourceRoot, source));
     const entry: CopyEntry = { source, destination: dest, size: stat.size, mtime: stat.mtimeMs };
     const document = documents.get(source);
@@ -195,7 +245,7 @@ export async function planCopy(request: CopyRequest): Promise<CopyPlan> {
       entry.digest = hash(document.text);
       let content = document.text;
       for (const { ref, resolved } of [...document.links].reverse()) {
-        const newTarget = resolved && mapping.get(resolved);
+        const newTarget = resolved && (mapping.get(resolved) ?? attachmentsByNote.get(context)?.get(resolved));
         if (!newTarget) continue;
         const suffix = splitTarget(ref.target).suffix;
         let replacement: string;
@@ -215,8 +265,9 @@ export async function planCopy(request: CopyRequest): Promise<CopyPlan> {
     }
     entries.push(entry);
   }
-  for (const file of files) if (/\.(canvas|excalidraw)$/i.test(file)) warnings.push(t("{0}：作为普通文件复制，不解析内部依赖。", file));
-  return { sourceRoot, targetRoot, entries, directories: [...directories], warnings: [...new Set(warnings)], renamed, notes: documents.size, attachments: entries.length - documents.size };
+  for (const file of allFiles) if (/\.(canvas|excalidraw)$/i.test(file)) warnings.push(t("{0}：作为普通文件复制，不解析内部依赖。", file));
+  const notes = files.filter(file => documents.has(file)).length;
+  return { sourceRoot, targetRoot, entries, directories: [...directories], warnings: [...new Set(warnings)], renamed, notes, attachments: entries.length - notes };
 }
 
 export async function executeCopy(plan: CopyPlan, progress?: (done: number, total: number) => void): Promise<void> {

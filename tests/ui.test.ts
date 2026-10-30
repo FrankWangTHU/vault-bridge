@@ -102,3 +102,26 @@ it('switches the rendered settings and restores the saved language on reload', a
   expect((restored as any).commands[0].name).toBe("Copy current file's local path");
 });
 
+it('saves the attachment layout and keeps it while switching interface languages', async () => {
+  const app = { workspace: { on: () => {}, iterateAllLeaves: () => {} }, vault: { adapter: new FileSystemAdapter('/source') } };
+  const plugin = new NoteParcel(app as any, {} as any);
+  vi.spyOn(plugin, 'loadData').mockResolvedValue({ language: 'en', lastTarget: '/Archive' });
+  await plugin.onload();
+  const tab = (plugin as any).settingTabs[0]; tab.display();
+  expect(tab.containerEl.textContent).toContain('Attachment location');
+  expect(tab.containerEl.textContent).toContain('Organize by note name');
+  const select = tab.containerEl.querySelectorAll('select')[1];
+  expect(select.value).toBe('note');
+  const save = vi.spyOn(plugin, 'saveData');
+  select.value = 'shared'; select.dispatchEvent(new Event('change'));
+  await vi.waitFor(() => expect(save).toHaveBeenLastCalledWith(expect.objectContaining({ attachmentFolderMode: 'shared', lastTarget: '/Archive' })));
+  await plugin.setLanguage('zh-CN'); tab.display();
+  expect(tab.containerEl.textContent).toContain('附件存放方式');
+  expect(tab.containerEl.textContent).toContain('按笔记名分类');
+  expect(tab.containerEl.querySelectorAll('select')[1].value).toBe('shared');
+  const restored = new NoteParcel(app as any, {} as any);
+  vi.spyOn(restored, 'loadData').mockResolvedValue(save.mock.lastCall![0]);
+  await restored.onload();
+  expect(restored.settings.attachmentFolderMode).toBe('shared');
+});
+

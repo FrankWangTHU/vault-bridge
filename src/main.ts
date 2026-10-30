@@ -6,8 +6,8 @@ import { executeCopy, planCopy, type CopyPlan, type CopyRequest } from './copy';
 import { canonicalPath, discoverVaults, samePath, type TargetVault } from './vaults';
 import { DRAG_MIME, dropFolder, explorerItem, isCrossVaultDrag, parseDragPayload, resolveDraggedLink, sourceType, type DragPayload } from './drag';
 import { CopyModal, ReportModal } from './ui';
-interface Settings { language: LanguagePreference; autoConvert: boolean; targets: TargetVault[]; lastTarget: string; crossVaultDrag: boolean }
-const DEFAULTS: Settings = { language: 'auto', autoConvert: true, targets: [], lastTarget: '', crossVaultDrag: true };
+interface Settings { language: LanguagePreference; attachmentFolderMode: 'shared' | 'note'; autoConvert: boolean; targets: TargetVault[]; lastTarget: string; crossVaultDrag: boolean }
+const DEFAULTS: Settings = { language: 'auto', attachmentFolderMode: 'note', autoConvert: true, targets: [], lastTarget: '', crossVaultDrag: true };
 export default class NoteParcel extends Plugin {
   settings: Settings = { ...DEFAULTS, targets: [] };
   copying = false;
@@ -49,6 +49,7 @@ export default class NoteParcel extends Plugin {
     const saved = await this.loadData();
     this.settings = { ...DEFAULTS, ...saved, targets: Array.isArray(saved?.targets) ? saved.targets : [] };
     if (!['auto', 'en', 'zh-CN'].includes(this.settings.language)) this.settings.language = 'auto';
+    if (!['shared', 'note'].includes(this.settings.attachmentFolderMode)) this.settings.attachmentFolderMode = 'note';
     this.addSettingTab(new BridgeSettings(this.app, this));
     this.registerEvent(this.app.workspace.on('file-menu', (menu, file) => {
       menu.addItem(item => item.setTitle(this.t("复制本地绝对路径")).setIcon('copy').onClick(() => this.copyPath(file)));
@@ -79,9 +80,13 @@ export default class NoteParcel extends Plugin {
   }
   async saveSettings() { await this.saveData(this.settings); }
   async targets() { return discoverVaults(this.sourceRoot, this.settings.targets, undefined, this.locale); }
+  private resolveLink(link: string, source: string) {
+    return this.app.metadataCache.getFirstLinkpathDest(link, source)
+      ?? (/\.excalidraw$/i.test(link) ? this.app.metadataCache.getFirstLinkpathDest(`${link}.md`, source) : null);
+  }
   request(selection: string[], target: TargetVault, destination: string): CopyRequest {
-    return { language: this.locale, sourceRoot: this.sourceRoot, targetRoot: target.path, selection, destination, configDir: this.app.vault.configDir,
-      resolve: (link, source) => this.app.metadataCache.getFirstLinkpathDest(link, source)?.path ?? null };
+    return { language: this.locale, attachmentFolderMode: this.settings.attachmentFolderMode, sourceRoot: this.sourceRoot, targetRoot: target.path, selection, destination, configDir: this.app.vault.configDir,
+      resolve: (link, source) => this.resolveLink(link, source)?.path ?? null };
   }
   async transfer(request: CopyRequest, progress?: (label: string) => void): Promise<CopyPlan> {
     if (this.copying) throw new Error(this.t("已有复制任务正在进行，请稍候。"));
@@ -120,12 +125,19 @@ export default class NoteParcel extends Plugin {
           ? [...doc.querySelectorAll<HTMLElement>('.nav-files-container .nav-file-title.is-selected[data-path], .nav-files-container .nav-folder-title.is-selected[data-path]')].map(el => el.dataset.path!) : [ownPath];
         const selections = selected.length ? selected : [ownPath];
         const payload: DragPayload = { version: 1, sourceRoot: this.sourceRoot, configDir: this.app.vault.configDir, selections, resolved: Object.create(null) };
-        for (const file of this.app.vault.getMarkdownFiles()) {
-          if (!selections.some(p => file.path === p || file.path.startsWith(`${p}/`))) continue;
+        const queue = this.app.vault.getMarkdownFiles().filter(file => selections.some(p => file.path === p || file.path.startsWith(`${p}/`)));
+        const visited = new Set<string>();
+        for (let index = 0; index < queue.length; index++) {
+          const file = queue[index];
+          if (visited.has(file.path)) continue;
+          visited.add(file.path);
           const cache = this.app.metadataCache.getFileCache(file), links: Record<string, string> = Object.create(null);
           for (const ref of [...cache?.links ?? [], ...cache?.embeds ?? []]) {
-            const link = splitTarget(ref.link).path, resolved = this.app.metadataCache.getFirstLinkpathDest(link, file.path);
-            if (resolved) links[link] = resolved.path;
+            const link = splitTarget(ref.link).path, resolved = this.resolveLink(link, file.path);
+            if (resolved) {
+              links[link] = resolved.path;
+              if (/\.excalidraw\.md$/i.test(resolved.path) && !visited.has(resolved.path)) queue.push(resolved);
+            }
           }
           payload.resolved[file.path] = links;
         }
@@ -150,7 +162,7 @@ export default class NoteParcel extends Plugin {
       const payload = parseDragPayload(raw), sourceRoot = await canonicalPath(payload.sourceRoot);
       const { vaults } = await this.targets();
       if (!vaults.some(v => samePath(v.path, sourceRoot))) throw new Error(this.t("来源不是已登记的其他 Vault，请在 Obsidian 库列表中添加它后重试。"));
-      const plan = await this.transfer({ language: this.locale, sourceRoot, targetRoot: this.sourceRoot, selection: payload.selections, destination, configDir: payload.configDir,
+      const plan = await this.transfer({ language: this.locale, attachmentFolderMode: this.settings.attachmentFolderMode, sourceRoot, targetRoot: this.sourceRoot, selection: payload.selections, destination, configDir: payload.configDir,
         resolve: (link, source) => resolveDraggedLink(payload, link, source) });
       if (plan.warnings.length) new ReportModal(this.app, plan, this.t).open();
     } catch (error) { new Notice(this.t("跨库拖拽未完成：{0}", this.errorText(error)), 10000); }
@@ -166,6 +178,15 @@ class BridgeSettings extends PluginSettingTab {
         .setValue(this.plugin.settings.language).onChange(async value => {
           if (value !== 'auto' && value !== 'zh-CN' && value !== 'en') return;
           await this.plugin.setLanguage(value); this.display();
+        }));
+    new Setting(containerEl).setName(this.plugin.t('附件存放方式'))
+      .setDesc(this.plugin.t('默认将外部附件放到复制后笔记旁的 assets/笔记名/，也可选择共享目录。所选文件夹内的附件保留原位置。'))
+      .addDropdown(dropdown => dropdown.addOption('note', this.plugin.t('按笔记名分类'))
+        .addOption('shared', this.plugin.t('共享附件目录'))
+        .setValue(this.plugin.settings.attachmentFolderMode).onChange(async value => {
+          if (value !== 'shared' && value !== 'note') return;
+          this.plugin.settings.attachmentFolderMode = value;
+          await this.plugin.saveSettings();
         }));
     new Setting(containerEl).setName(this.plugin.t("自动转换粘贴的公式和表格")).setDesc(this.plugin.t("同时修复丢失反斜杠的公式分隔符；代码与属性区不转换。")).addToggle(toggle => toggle.setValue(this.plugin.settings.autoConvert).onChange(async value => { this.plugin.settings.autoConvert = value; await this.plugin.saveSettings(); }));
     new Setting(containerEl).setName(this.plugin.t("跨 Vault 窗口拖拽复制")).setDesc(this.plugin.t("两边均需启用新版 NoteParcel；拖到目标库左侧文件列表或文件夹即可复制，源文件保留。")).addToggle(toggle => toggle.setValue(this.plugin.settings.crossVaultDrag).onChange(async value => { this.plugin.settings.crossVaultDrag = value; await this.plugin.saveSettings(); }));
